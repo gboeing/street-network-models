@@ -5,14 +5,13 @@
 
 
 import json
+import math
+import numpy as np
 import os
 import osmnx as ox
 import pandas as pd
-from keys import api_keys
-
-import math
-import numpy as np
 import string
+from keys import api_keys
 from sklearn.cluster import KMeans
 
 
