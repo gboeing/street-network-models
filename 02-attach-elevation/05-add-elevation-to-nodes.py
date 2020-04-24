@@ -10,6 +10,7 @@ import os
 import osmnx as ox
 import pandas as pd
 
+print('osmnx version', ox.__version__)
 
 # In[ ]:
 
