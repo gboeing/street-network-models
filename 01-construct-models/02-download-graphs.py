@@ -50,31 +50,8 @@ truncate_by_edge = True
 
 
 uc_gpkg_path = config['uc_gpkg_path'] #prepped urban centers dataset
-output_gpkg_path = config['models_gpkg_path'] #where to save graph geopackages
 output_graphml_path = config['models_graphml_path'] #where to save graphml files
-output_nelist_path = config['models_nelist_path'] #where to save node/edge lists
 
-
-# In[ ]:
-
-
-def save_node_edge_lists(G, nelist_folder):
-    
-    # save node and edge lists as csv
-    nodes, edges = ox.graph_to_gdfs(G, node_geometry=False, fill_edge_geometry=False)
-    edges['length'] = edges['length'].round(3).astype(str)
-
-    ecols = ['u', 'v', 'key', 'oneway', 'highway', 'name', 'length',
-             'lanes', 'width', 'est_width', 'maxspeed', 'access', 'service',
-             'bridge', 'tunnel', 'area', 'junction', 'osmid', 'ref']
-
-    edges = edges.drop(columns=['geometry']).reindex(columns=ecols)
-    nodes = nodes.reindex(columns=['osmid', 'x', 'y', 'ref', 'highway'])
-
-    if not os.path.exists(nelist_folder):
-        os.makedirs(nelist_folder)
-    nodes.to_csv('{}/node_list.csv'.format(nelist_folder), index=False, encoding='utf-8')
-    edges.to_csv('{}/edge_list.csv'.format(nelist_folder), index=False, encoding='utf-8')
 
 
 # ## Load the prepped urban centers data
@@ -84,7 +61,7 @@ def save_node_edge_lists(G, nelist_folder):
 
 # load the prepped dataset
 ucs = gpd.read_file(uc_gpkg_path).sort_values('B15', ascending=False)
-print('loaded urban centers dataset with shape', ucs.shape)
+print(ox.ts(), 'loaded urban centers dataset with shape', ucs.shape)
 
 
 # In[ ]:
@@ -92,7 +69,7 @@ print('loaded urban centers dataset with shape', ucs.shape)
 
 # only retain urban centers marked as a "true positive" in quality control
 ucs = ucs[ucs['QA2_1V'] == 1]
-print('retained "true positive" urban centers dataset with shape', ucs.shape)
+print(ox.ts(), 'retained "true positive" urban centers dataset with shape', ucs.shape)
 
 
 # In[ ]:
@@ -100,7 +77,7 @@ print('retained "true positive" urban centers dataset with shape', ucs.shape)
 
 # only retain urban centers with at least 1 sq km of built-up area
 ucs = ucs[ucs['B15'] >= 1]
-print('retained >=1 km2 built-up area urban centers dataset with shape', ucs.shape)
+print(ox.ts(), 'retained >=1 km2 built-up area urban centers dataset with shape', ucs.shape)
 
 
 # ## Download the urban centers' street networks one at a time
@@ -118,27 +95,24 @@ failed_list = []
 
 
 # In[ ]:
-print('begin getting', len(ucs_to_get), 'graphs')
+print(ox.ts(), 'begin getting', len(ucs_to_get), 'graphs')
 
 for label, row in ucs_to_get.iterrows():
     try:
         # graph name = country + country iso + uc + uc id
         graph_name = '{}-{}-{}-{}'.format(row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
-        
         graphml_folder = '{}/{}-{}'.format(output_graphml_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
         graphml_file = '{}-{}.graphml'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
         
-        gpkg_folder = '{}/{}-{}'.format(output_gpkg_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
-        gpkg_file = '{}-{}.gpkg'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
+        #gpkg_folder = '{}/{}-{}'.format(output_gpkg_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
+        #gpkg_file = '{}-{}.gpkg'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
         
-        nelist_folder = '{}/{}-{}/{}-{}'.format(output_nelist_path, row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])        
+        #nelist_folder = '{}/{}-{}/{}-{}'.format(output_nelist_path, row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
         
         if not os.path.exists('{}/{}'.format(graphml_folder, graphml_file)):
             
-            # timestamp and graph name
-            print('{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), graph_name)
-            
             # get graph
+            print(ox.ts(), graph_name)
             G = ox.graph_from_polygon(polygon=row['geometry'].buffer(0),
                                       network_type=network_type,
                                       name=graph_name,
@@ -148,8 +122,8 @@ for label, row in ucs_to_get.iterrows():
             
             # don't save graphs if they have fewer than 3 nodes
             if len(G.nodes()) > 2:
-                save_node_edge_lists(G, nelist_folder)
-                ox.save_graph_geopackage(G, folder=gpkg_folder, filename=gpkg_file)
+                #save_node_edge_lists(G, nelist_folder) #do this later when we've got the elevations too
+                #ox.save_graph_geopackage(G, folder=gpkg_folder, filename=gpkg_file) #do this later when we've got the elevations too
                 ox.save_graphml(G, folder=graphml_folder, filename=graphml_file)                
                 count_success = count_success + 1
             else:
@@ -167,12 +141,12 @@ for label, row in ucs_to_get.iterrows():
 
 
 end_time = time.time() - start_time
-print(f'{count_already} UCs already done')
-print(f'{count_small} UCs too small')
-print(f'{count_failed} UCs failed')
-print(f'{count_success} UCs succeeded')
-print('failed UCs:', str(failed_list))
-print('Finished making {:,.0f} UC graphs in {:,.1f} seconds'.format(len(ucs_to_get), end_time))
+print(ox.ts(), f'{count_already} UCs already done')
+print(ox.ts(), f'{count_small} UCs too small')
+print(ox.ts(), f'{count_failed} UCs failed')
+print(ox.ts(), f'{count_success} UCs succeeded')
+print(ox.ts(), 'failed UCs:', str(failed_list))
+print(ox.ts(), 'Finished making {:,.0f} UC graphs in {:,.1f} seconds'.format(len(ucs_to_get), end_time))
 
 
 # In[ ]:
