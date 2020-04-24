@@ -105,9 +105,14 @@ print(ox.ts(), 'retained {} nodes we currently lack elevation data for'.format(l
 
 # In[ ]:
 
+# resort by cluster so nodes and urls will be in same order
+nodes = nodes.sort_values('cluster')
+clusters = nodes.groupby('cluster', sort=True)
+print(ox.ts(), 'there are {} clusters'.format(len(clusters)))
 
-# for each cluster, create URLs of no more than batch_size elevation requests
-urls = [get_url(cluster) for _, cluster in nodes.groupby('cluster')]
+
+# create one url for each cluster of nodes
+urls = {label:get_url(cluster) for label, cluster in clusters}
 urls = pd.Series(urls)
 print(ox.ts(), 'constructed {} urls'.format(len(urls)))
 
@@ -119,7 +124,7 @@ keys_list = []
 for key in api_keys:
     keys_list.extend([key] * max_requests)
 
-keys = pd.Series(keys_list[0:len(urls)])
+keys = pd.Series(data=keys_list[0:len(urls)], index=urls.index)
 assert len(keys) == len(urls)
 
 urls = urls + keys
@@ -137,14 +142,16 @@ assert len(nodes['cluster'].unique()) == len(urls)
 
 
 # save urls to disk
-urls.to_csv(urls_path, index=False, encoding='utf-8')
+urls = urls.rename('url')
+urls.index.rename('cluster', inplace=True)
+urls.to_csv(urls_path, index=True, encoding='utf-8')
 print(ox.ts(), 'saved {} urls at {}'.format(len(urls), urls_path))
 
 
 # In[ ]:
 
 
-key_counts = keys.value_counts().reindex(keys.unique())
+key_counts = keys.value_counts().reindex(api_keys)
 for key, count in key_counts.iteritems():
     print(ox.ts(), 'key ~{} has {} urls'.format(key[-6:], count))
 
@@ -154,7 +161,7 @@ for key, count in key_counts.iteritems():
 
 # save nodes that we are going to request elevations for to disk in order
 # we will use this order to match the url batch requests back to their nodes
-nodes.reset_index().drop(columns='latlng').to_csv(nodestoget_path, index=False, encoding='utf-8')
+nodes.to_csv(nodestoget_path, index=True, encoding='utf-8')
 print(ox.ts(), 'saved {} node osmids at {}'.format(len(nodes), nodestoget_path))
 
 
