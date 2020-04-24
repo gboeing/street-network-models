@@ -23,6 +23,7 @@ with open('../config.json') as f:
 
 
 # GHS urban centers dataset
+print(ox.ts(), 'loading urban centers dataset from', config['uc_input_path'])
 ucs = gpd.read_file(config['uc_input_path'])
 ucs = ucs.sort_values('P15', ascending=True).reset_index(drop=True) #sort by pop
 
@@ -39,7 +40,7 @@ ucs['geometry'] = ucs['geometry'].buffer(0)
 # In[5]:
 
 
-print('loaded urban centers dataset with shape', ucs.shape)
+print(ox.ts(), 'loaded urban centers dataset with shape', ucs.shape)
 
 
 # ## Clean and prep
@@ -127,9 +128,8 @@ ucs_save = ucs[cols]
 # In[10]:
 
 
-print('saving urban centers dataset with shape', ucs_save.shape, config['uc_gpkg_path'])
 ucs_save.to_file(config['uc_gpkg_path'], driver='GPKG', encoding='utf-8')
-
+print(ox.ts(), 'saved urban centers dataset with shape', ucs_save.shape, config['uc_gpkg_path'])
 
 # In[ ]:
 
