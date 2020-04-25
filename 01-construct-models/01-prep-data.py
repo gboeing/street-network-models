@@ -108,9 +108,9 @@ cols = ['QA2_1V',      # quality control code (1=true positive, 0=false positive
         'DEV_CMI',     # UN development group
         
         # pollution emission and concentration
-        'E_EC2E_T15',  # transport-sector co2 emissions from fossil fuels (2012) 10^3 kg/year
-        'E_EC2O_T15',  # transport-sector co2 emissions from bio fuels (2012) 10^3 kg/year
-        'E_EPM2_T15',  # transport-sector pm2.5 emissions (2012) 10^3 kg/year
+        'E_EC2E_T15',  # transport-sector co2 emissions from fossil fuels (2015) 10^3 kg/year
+        'E_EC2O_T15',  # transport-sector co2 emissions from bio fuels (2015) 10^3 kg/year
+        'E_EPM2_T15',  # transport-sector pm2.5 emissions (2015) 10^3 kg/year
         'E_CPM2_T14',  # pm2.5 concentration (2014) micrograms per cubic meter air
         
         # geography
