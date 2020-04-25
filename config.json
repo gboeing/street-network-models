@@ -7,6 +7,7 @@
     "models_graphml_path"         : "/data/wc/models/graphml",
     "models_nelist_path"          : "/data/wc/models/nelist",
     "indicators_path"             : "/data/wc/indicators/indicators.csv",
+    "indicators_street_path"      : "/data/wc/indicators/indicators-street.csv",
     "indicators_metadata_path"    : "/data/wc/indicators/indicators-metadata.csv",
     "elevation_nodes_path"        : "/data/wc/elevation/nodes/country-nodes",
     "elevation_nodeclusters_path" : "/data/wc/elevation/nodes/country-clusters",
