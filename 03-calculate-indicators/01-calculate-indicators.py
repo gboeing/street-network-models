@@ -27,10 +27,10 @@ ox.config(log_file=True,
           logs_folder=config['osmnx_log_path'])
 
 graphml_folder = config['models_graphml_path'] #where to load graphml files
-indicators_path = config['indicators_path']    #where to save output indicators
+indicators_street_path = config['indicators_street_path']    #where to save output street network indicators
 save_every_n = 100 #save results every n cities
 
-indicators_folder = indicators_path[:indicators_path.rfind('/')]
+indicators_folder = indicators_street_path[:indicators_street_path.rfind('/')]
 if not os.path.exists(indicators_folder):
     os.makedirs(indicators_folder)
 
@@ -205,8 +205,8 @@ def calculate_graph_indicators(filepath):
 # In[ ]:
 
 
-if os.path.exists(indicators_path):
-    indicators = pd.read_csv(indicators_path).set_index('uc_id', drop=False).T.to_dict()
+if os.path.exists(indicators_street_path):
+    indicators = pd.read_csv(indicators_street_path).set_index('uc_id', drop=False).T.to_dict()
 else:
     indicators = {}
 
@@ -240,14 +240,14 @@ for country_folder in sorted(os.listdir(graphml_folder)):
             # save periodically
             counter += 1
             if counter % save_every_n == 0:
-                df = save_results(indicators, indicators_path)
+                df = save_results(indicators, indicators_street_path)
 
 
 # In[ ]:
 
 
 # final save to disk
-df = save_results(indicators, indicators_path)
+df = save_results(indicators, indicators_street_path)
 
 
 # In[ ]:
