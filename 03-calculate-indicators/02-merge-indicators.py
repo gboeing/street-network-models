@@ -51,7 +51,7 @@ mapper = {'UC_NM_LST'  : 'uc_names',
           'AREA'       : 'area',
           'B15'        : 'built_up_area',
           'BUCAP15'    : 'built_up_area_percap',
-          'NTL_AV'     : 'night_light_em', #avg nighttime light emission 2015 (nano-watt per steradian per square centimetre)
+          'NTL_AV'     : 'night_light_em',
           'GDP15_SM'   : 'gdp_ppp',
           'INCM_CMI'   : 'un_income_class',
           'DEV_CMI'    : 'un_dev_group',
@@ -64,7 +64,9 @@ mapper = {'UC_NM_LST'  : 'uc_names',
           'E_WR_P_14'  : 'avg_precipitation',
           'E_WR_T_14'  : 'avg_temperature',
           'SDG_LUE9015': 'land_use_efficiency',
-          'SDG_OS15MX' : 'pct_open_space'}
+          'SDG_OS15MX' : 'pct_open_space',
+          'GCPNT_LAT'  : 'centroid_lat',
+          'GCPNT_LON'  : 'centroid_lng'}
 
 
 # In[ ]:
@@ -177,6 +179,8 @@ desc['avg_precipitation'] = 'Average precipitation for 2014, mm (Harris)'
 desc['avg_temperature'] = 'Average temperature for 2014, celsius (Harris)'
 desc['land_use_efficiency'] = 'Land use efficiency 1990-2015 (Melchiorri)'
 desc['pct_open_space'] = 'Percent open space (JRC)'
+desc['centroid_lng'] = 'longitude of the area centroid, decimal degrees'
+desc['centroid_lat'] = 'latitude of the area centroid, decimal degrees'
 
 # turn the metadata descriptions into a dataframe
 metadata = pd.DataFrame(desc, index=['description']).T

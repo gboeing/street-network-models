@@ -121,7 +121,11 @@ cols = ['QA2_1V',      # quality control code (1=true positive, 0=false positive
         'E_WR_T_14',   # avg temperature
         'SDG_LUE9015', # land use efficiency
         'SDG_OS15MX',  # percentage open space
-        'geometry']
+
+        # geometry
+        'GCPNT_LAT',   # area centroid lat
+        'GCPNT_LON',   # area centroid lng
+        'geometry']    # area polygon
 
 ucs_save = ucs[cols]
 
