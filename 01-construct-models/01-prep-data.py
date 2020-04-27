@@ -69,8 +69,8 @@ def clean_str(s, regex=regex):
     s = regex.sub('_', s).lower().strip('_')
     return s
 
-cols = ['UC_NM_MN', 'CTR_MN_NM']
-ucs[cols] = ucs[cols].applymap(clean_str).applymap(lambda x: x.lower())
+cols_lower = ['UC_NM_MN', 'CTR_MN_NM']
+ucs[cols_lower] = ucs[cols_lower].applymap(clean_str).applymap(lambda x: x.lower())
 
 
 # In[8]:
@@ -103,6 +103,7 @@ cols = ['QA2_1V',      # quality control code (1=true positive, 0=false positive
         'BUCAP15',     # surface of built-up area per-person 2015 (sq m per person)
         
         # economic development
+        'NTL_AV',      # avg nighttime light emission 2015 (nano-watt per steradian per square centimetre)
         'GDP15_SM',    # gdp ppp 2015 (2011 USD)
         'INCM_CMI',    # UN income class
         'DEV_CMI',     # UN development group
