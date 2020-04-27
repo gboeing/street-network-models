@@ -80,7 +80,7 @@ def graph_elevations(country_folder, graph_filename):
     
     # save as geopackage
     gpkg_output_folder = os.path.join(gpkg_folder, country_folder)
-    gpkg_filename = uc_name + '.graphml'
+    gpkg_filename = uc_name + '.gpkg'
     ox.save_graph_geopackage(G, folder=gpkg_output_folder, filename=gpkg_filename)
     print(ox.ts(), 'save', gpkg_output_folder + '/' + gpkg_filename)
 
