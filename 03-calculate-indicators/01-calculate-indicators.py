@@ -126,10 +126,11 @@ def elevation_grades(G):
     
     grades = pd.Series(nx.get_edge_attributes(G, 'grade_abs'))
     elevs = pd.Series(nx.get_node_attributes(G, 'elevation'))
+    elev_res_mean = pd.Series(nx.get_node_attributes(G, 'elevation_res')).mean()
     elev_iqr = elevs.quantile(0.75) - elevs.quantile(0.25)
     elev_range = elevs.max() - elevs.min()
     
-    return grades.mean(), grades.median(), elevs.mean(), elevs.median(), elevs.std(), elev_range, elev_iqr
+    return grades.mean(), grades.median(), elevs.mean(), elevs.median(), elevs.std(), elev_range, elev_iqr, elev_res_mean
 
 
 # In[ ]:
@@ -169,7 +170,7 @@ def calculate_graph_indicators(filepath):
     straightness = 1 / circuity
     
     # elevation and grade
-    grade_mean, grade_median, elev_mean, elev_median, elev_std, elev_range, elev_iqr = elevation_grades(Gu)
+    grade_mean, grade_median, elev_mean, elev_median, elev_std, elev_range, elev_iqr, elev_res_mean = elevation_grades(Gu)
     
     # total and clean intersection counts
     intersect_count, intersect_count_clean = intersection_counts(Gu)
@@ -185,6 +186,7 @@ def calculate_graph_indicators(filepath):
             'elev_median'           : elev_median,
             'elev_range'            : elev_range,
             'elev_std'              : elev_std,
+            'elev_res_mean'         : elev_res_mean,
             'grade_mean'            : grade_mean,
             'grade_median'          : grade_median,
             'intersect_count'       : intersect_count,
