@@ -78,6 +78,6 @@ print('same set of names across all file types:', names_check)
 
 # throw exception if any checks failed
 if (country_check and file_check and names_check):
-	print('ALL CHECKS OK')
+    print('ALL CHECKS OK')
 else:
-	print('WARNING: SOME CHECKS FAILED')
+    print('WARNING: SOME CHECKS FAILED')
