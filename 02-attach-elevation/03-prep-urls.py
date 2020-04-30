@@ -18,13 +18,16 @@ import json
 import os
 import osmnx as ox
 import pandas as pd
-from keys import api_keys
 
 print('osmnx version', ox.__version__)
 
 
 # In[ ]:
 
+# load google maps elevation api keys
+with open('keys.json') as f:
+    data = json.load(f)
+    api_keys = data['api_keys']
 
 # load configs
 with open('../config.json') as f:
