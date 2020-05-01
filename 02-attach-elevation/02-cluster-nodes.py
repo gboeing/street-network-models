@@ -11,7 +11,6 @@ import os
 import osmnx as ox
 import pandas as pd
 import string
-from keys import api_keys
 from sklearn.cluster import KMeans
 
 
@@ -55,16 +54,23 @@ def subcluster(nodes, labels, n=None, size=batch_size):
     
     print(ox.ts(), 'clustering', len(nodes.loc[labels]), 'nodes into', n, 'clusters')
     X = nodes.loc[labels, ['x', 'y']].values
-    kmeans = KMeans(n_clusters=n, init='k-means++', algorithm='elkan',
-                    n_init=10, n_jobs=10, max_iter=300, random_state=0)
+    kmeans = KMeans(n_clusters=n, 
+                    init='k-means++', 
+                    algorithm='elkan',
+                    n_init=10, 
+                    n_jobs=10, 
+                    max_iter=300, 
+                    random_state=0)
 
     kmeans = kmeans.fit(X)
     cluster_labels = pd.Series(kmeans.predict(X)).astype(str).values
     
     if 'cluster' in nodes.columns:
+        # make this a subcluster
         separators = np.array(['-'] * len(cluster_labels))
         nodes.loc[labels, 'cluster'] = nodes.loc[labels, 'cluster'].str.cat(others=[separators, cluster_labels])
     else:
+        # create a new cluster column
         nodes['cluster'] = cluster_labels
 
 
@@ -73,9 +79,9 @@ def subcluster(nodes, labels, n=None, size=batch_size):
 
 def longest_axis(points, x, y):
     
-    xrange = points[x].max() - points[x].min()
-    yrange = points[y].max() - points[y].min()
-    if xrange > yrange:
+    x_range = points[x].max() - points[x].min()
+    y_range = points[y].max() - points[y].min()
+    if x_range > y_range:
         return x
     else:
         return y
