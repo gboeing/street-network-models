@@ -102,7 +102,8 @@ print(ox.ts(), 'keep {} unique nodes'.format(len(nodes)))
 if os.path.exists(elevations_path):
     preexisting = pd.read_csv(elevations_path).set_index('osmid')
     existing_elevations = preexisting[pd.notnull(preexisting['elev'])]
-    labels = existing_elevations.reindex(nodes.index).index
+    print(ox.ts(), 'found', len(existing_elevations), 'preexisting node elevations at', elevations_path)
+    labels = existing_elevations.reindex(nodes.index).dropna().index
     nodes = nodes.drop(labels=labels)
 print(ox.ts(), 'retained {} nodes we currently lack elevation data for'.format(len(nodes)))
 
@@ -155,7 +156,7 @@ print(ox.ts(), 'saved {} urls at {}'.format(len(urls), urls_path))
 # In[ ]:
 
 
-key_counts = keys.value_counts().reindex(api_keys)
+key_counts = keys.value_counts().reindex(api_keys).fillna(0).astype(int)
 for key, count in key_counts.iteritems():
     print(ox.ts(), 'key ~{} has {} urls'.format(key[-6:], count))
 
