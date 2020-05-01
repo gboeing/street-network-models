@@ -60,7 +60,7 @@ def get_url(cluster):
 
 
 def get_nodes(file):
-    # load nodes from file
+    # load clustered nodes from file
     nodes = pd.read_csv(f'{nodes_folder}/{file}', index_col='osmid')
     
     # create latlng column rounded to 5 decimals (ie, 1-meter precision)
@@ -74,6 +74,7 @@ def get_nodes(file):
 
 print(ox.ts(), 'loading nodes from graph files:', end=' ')
 
+# load clustered nodes
 nodes = pd.DataFrame()
 for file in sorted(os.listdir(nodes_folder)):
     print(file.split('-')[0], end=' ', flush=True)
@@ -100,7 +101,7 @@ print(ox.ts(), 'keep {} unique nodes'.format(len(nodes)))
 # so drop any nodes that we already downloaded elevation for
 if os.path.exists(elevations_path):
     preexisting = pd.read_csv(elevations_path).set_index('osmid')
-    existing_elevations = preexisting[pd.notnull(preexisting['elevation'])]
+    existing_elevations = preexisting[pd.notnull(preexisting['elev'])]
     labels = existing_elevations.reindex(nodes.index).index
     nodes = nodes.drop(labels=labels)
 print(ox.ts(), 'retained {} nodes we currently lack elevation data for'.format(len(nodes)))
@@ -122,7 +123,7 @@ print(ox.ts(), 'constructed {} urls'.format(len(urls)))
 
 # In[ ]:
 
-
+# attach an api key to each url
 keys_list = []
 for key in api_keys:
     keys_list.extend([key] * max_requests)
