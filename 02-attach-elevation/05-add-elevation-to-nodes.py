@@ -61,10 +61,14 @@ def graph_elevations(country_folder, graph_filename):
     print(ox.ts(), 'load', len(G.nodes()), 'nodes and', len(G.edges()), 'edges from', graph_filepath)
     
     # add elevation and elevation resolution as new attributes to edges
-    # then calculate edge grades
     graph_elevations = elevations.loc[set(G.nodes())].sort_index()
     nx.set_node_attributes(G, name='elevation', values=graph_elevations['elev'])
     nx.set_node_attributes(G, name='elevation_res', values=graph_elevations['elev_res'])
+    
+    # check if any graph node is missing elevation
+    assert set(G.nodes()) == set(nx.get_node_attributes(G, 'elevation')) == set(nx.get_node_attributes(G, 'elevation_res'))
+
+    # then calculate edge grades
     G = ox.add_edge_grades(G, add_absolute=True)
     
     # resave graphml now that it has elevations/grades
