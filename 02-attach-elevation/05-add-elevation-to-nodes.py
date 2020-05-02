@@ -42,7 +42,7 @@ def save_node_edge_lists(G, nelist_folder):
              'bridge', 'tunnel', 'area', 'junction', 'osmid', 'ref']
 
     edges = edges.drop(columns=['geometry']).reindex(columns=ecols)
-    nodes = nodes.reindex(columns=['osmid', 'x', 'y', 'ref', 'highway'])
+    nodes = nodes.reindex(columns=['osmid', 'x', 'y', 'elevation', 'elevation_res', 'ref', 'highway'])
 
     if not os.path.exists(nelist_folder):
         os.makedirs(nelist_folder)
