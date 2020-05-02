@@ -6,6 +6,8 @@
     "models_gpkg_path"            : "/data/wc/models/gpkg",
     "models_graphml_path"         : "/data/wc/models/graphml",
     "models_nelist_path"          : "/data/wc/models/nelist",
+    "models_metadata_edges_path"  : "/data/wc/models/metadata-graph-edges.csv",
+    "models_metadata_nodes_path"  : "/data/wc/models/metadata-graph-nodes.csv",
     "indicators_path"             : "/data/wc/indicators/indicators.csv",
     "indicators_street_path"      : "/data/wc/indicators/indicators-street.csv",
     "indicators_metadata_path"    : "/data/wc/indicators/indicators-metadata.csv",
