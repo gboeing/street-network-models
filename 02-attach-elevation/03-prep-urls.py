@@ -2,13 +2,13 @@
 # coding: utf-8
 
 # each api key belongs to a project attached to a different billing account. each billing account gets $200/month credit.
-# 
+#
 # from: https://cloud.google.com/maps-platform/pricing/sheet/
-# 
+#
 # up to 40,000 calls for free monthly
-# 
+#
 # From https://developers.google.com/maps/documentation/elevation/intro
-# 
+#
 # > URLs must be properly encoded to be valid and are limited to 8192 characters for all web services. Be aware of this limit when constructing your URLs. Note that different browsers, proxies, and servers may have different URL character limits as well.
 
 # In[ ]:
@@ -62,10 +62,10 @@ def get_url(cluster):
 def get_nodes(file):
     # load clustered nodes from file
     nodes = pd.read_csv(f'{nodes_folder}/{file}', index_col='osmid')
-    
+
     # create latlng column rounded to 5 decimals (ie, 1-meter precision)
     nodes['latlng'] = nodes.apply(lambda row: '{:.5f},{:.5f}'.format(row['y'], row['x']), axis=1)
-    
+
     return nodes.drop(columns=['x', 'y'])
 
 
@@ -79,7 +79,7 @@ nodes = pd.DataFrame()
 for file in sorted(os.listdir(nodes_folder)):
     print(file.split('-')[0], end=' ', flush=True)
     nodes = nodes.append(other=get_nodes(file), ignore_index=False, verify_integrity=False)
-    
+
 print('')
 print(ox.ts(), f'load {len(nodes)} total nodes')
 

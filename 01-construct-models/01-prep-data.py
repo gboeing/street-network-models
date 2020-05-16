@@ -95,25 +95,25 @@ cols = ['QA2_1V',      # quality control code (1=true positive, 0=false positive
         'UC_NM_LST',   # urban center list of names
         'GRGN_L1',     # world region
         'GRGN_L2',     # world subregion
-        
+
         # population, area, density
         'P15',         # resident population (2015)
         'AREA',        # area in km2
         'B15',         # total built-up area 2015 (km2)
         'BUCAP15',     # surface of built-up area per-person 2015 (sq m per person)
-        
+
         # economic development
         'NTL_AV',      # avg nighttime light emission 2015 (nano-watt per steradian per square centimetre)
         'GDP15_SM',    # gdp ppp 2015 (2011 USD)
         'INCM_CMI',    # UN income class
         'DEV_CMI',     # UN development group
-        
+
         # pollution emission and concentration
         'E_EC2E_T15',  # transport-sector co2 emissions from fossil fuels (2015) 10^3 kg/year
         'E_EC2O_T15',  # transport-sector co2 emissions from bio fuels (2015) 10^3 kg/year
         'E_EPM2_T15',  # transport-sector pm2.5 emissions (2015) 10^3 kg/year
         'E_CPM2_T14',  # pm2.5 concentration (2014) micrograms per cubic meter air
-        
+
         # geography
         'E_KG_NM_LST', # climate classes
         'EL_AV_ALS',   # avg elevation

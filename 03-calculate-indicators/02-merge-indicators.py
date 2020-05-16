@@ -17,7 +17,7 @@ from collections import OrderedDict
 # load configs
 with open('../config.json') as f:
     config = json.load(f)
-    
+
 uc_gpkg_path = config['uc_gpkg_path'] #prepped urban centers dataset
 indicators_street_path = config['indicators_street_path'] #street network indicators to load
 indicators_path = config['indicators_path'] #merged indicators to save
