@@ -103,38 +103,38 @@ for label, row in ucs_to_get.iterrows():
         graph_name = '{}-{}-{}-{}'.format(row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
         graphml_folder = '{}/{}-{}'.format(output_graphml_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
         graphml_file = '{}-{}.graphml'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
-        
+
         #gpkg_folder = '{}/{}-{}'.format(output_gpkg_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
         #gpkg_file = '{}-{}.gpkg'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
-        
+
         #nelist_folder = '{}/{}-{}/{}-{}'.format(output_nelist_path, row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
-        
+
         if not os.path.exists('{}/{}'.format(graphml_folder, graphml_file)):
-            
+
             # get graph
             print(ox.ts(), graph_name)
             G = ox.graph_from_polygon(polygon=row['geometry'].buffer(0),
                                       network_type=network_type,
-                                      name=graph_name,
                                       retain_all=retain_all,
                                       simplify=simplify,
                                       truncate_by_edge=truncate_by_edge)
-            
+
             # don't save graphs if they have fewer than 3 nodes
             if len(G.nodes()) > 2:
                 #save_node_edge_lists(G, nelist_folder) #do this later when we've got the elevations too
                 #ox.save_graph_geopackage(G, folder=gpkg_folder, filename=gpkg_file) #do this later when we've got the elevations too
-                ox.save_graphml(G, folder=graphml_folder, filename=graphml_file)                
+                ox.save_graphml(G, filepath=os.path.join(graphml_folder, graphml_file))
                 count_success = count_success + 1
             else:
                 count_small = count_small + 1
         else:
             count_already = count_already + 1
-            
+
     except Exception as e:
         count_failed = count_failed + 1
         failed_list.append(graph_name)
         ox.log('"{}" failed: {}'.format(graph_name, e), level=lg.ERROR)
+        print(e)
 
 
 # In[ ]:

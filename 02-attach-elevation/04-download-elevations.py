@@ -21,7 +21,7 @@ print('osmnx version', ox.__version__)
 # load configs
 with open('../config.json') as f:
     config = json.load(f)
-    
+
 ox.config(use_cache=True,
           log_console=False,
           log_file=True,
@@ -73,16 +73,16 @@ total_count_cached = 0
 total_count_uncached = 0
 groups = urls.groupby('key', sort=False)
 for key, group in groups:
-    
+
     count_cached = 0
     count_uncached = 0
-    
+
     for url in group['url']:
-        if ox.url_in_cache(url) is None:
+        if ox.downloader._url_in_cache(url) is None:
             count_uncached += 1
         else:
             count_cached += 1
-    
+
     print(ox.ts(), 'will get {} urls from cache and {} from API for key ~{}'.format(count_cached, count_uncached, key[-6:]))
     total_count_cached += count_cached
     total_count_uncached += count_uncached
@@ -94,9 +94,9 @@ print(ox.ts(), 'will get', total_count_cached, 'urls from cache and', total_coun
 
 
 def request_url(url, pause_duration=pause_duration):
-    
+
     # check if this request is already in the cache (if ox.settings.use_cache=True)
-    cached_response_json = ox.get_from_cache(url)
+    cached_response_json = ox.downloader._get_from_cache(url)
     if cached_response_json is not None:
         response_json = cached_response_json
         ox.log('Got node elevations from cache')
@@ -108,11 +108,11 @@ def request_url(url, pause_duration=pause_duration):
             response = requests.get(url)
             assert response.ok
             response_json = response.json()
-            ox.save_to_cache(url, response_json)
+            ox.downloader._save_to_cache(url, response_json)
         except Exception as e:
             ox.log(e)
             print('Error - server responded with {}: {}'.format(response.status_code, response.reason))
-            
+
     return response_json['results']
 
 
@@ -152,19 +152,19 @@ results = None #release memory
 
 # if any preexisting node elevation data, merge new data with it
 if os.path.exists(elevations_path):
-    
+
     # if elevations_path already exists, we downloaded some elevation data during a previous run
     preexisting_elevations = pd.read_csv(elevations_path).set_index('osmid').sort_index()
     print(ox.ts(), 'found {} nodes with preexisting elevation data'.format(len(preexisting_elevations)))
-    
-    # append the newly downloaded elevation data to these preexisting elevations 
+
+    # append the newly downloaded elevation data to these preexisting elevations
     elevs = preexisting_elevations.append(other=nodes, ignore_index=False, verify_integrity=False).sort_index()
 
     # remove any duplicates
     elevs = elevs.loc[~elevs.index.duplicated(keep='first')]
     assert elevs.index.is_unique
     print(ox.ts(), 'we now have {} nodes\' elevation data'.format(len(elevs)))
-    
+
 else:
     elevs = nodes
     print(ox.ts(), 'found no preexisting elevation data file')

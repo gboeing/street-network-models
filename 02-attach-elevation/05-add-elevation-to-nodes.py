@@ -18,7 +18,7 @@ print('osmnx version', ox.__version__)
 # load configs
 with open('../config.json') as f:
     config = json.load(f)
-    
+
 ox.config(log_file=True,
           logs_folder=config['osmnx_log_path'])
 
@@ -32,7 +32,7 @@ elevations_path = config['elevation_elevations_path']
 
 
 def save_node_edge_lists(G, nelist_folder):
-    
+
     # save node and edge lists as csv
     nodes, edges = ox.graph_to_gdfs(G, node_geometry=False, fill_edge_geometry=False)
     edges['length'] = edges['length'].round(2).astype(str)
@@ -46,47 +46,46 @@ def save_node_edge_lists(G, nelist_folder):
 
     if not os.path.exists(nelist_folder):
         os.makedirs(nelist_folder)
-    nodes.to_csv('{}/node_list.csv'.format(nelist_folder), index=False, encoding='utf-8')
-    edges.to_csv('{}/edge_list.csv'.format(nelist_folder), index=False, encoding='utf-8')
+    nodes.to_csv(os.path.join(nelist_folder, 'node_list.csv'), index=False, encoding='utf-8')
+    edges.to_csv(os.path.join(nelist_folder, 'edge_list.csv'), index=False, encoding='utf-8')
 
 
 # In[ ]:
 
 
 def graph_elevations(country_folder, graph_filename):
-    
+
     # load graph
     graph_filepath = os.path.join(graphml_folder, country_folder, graph_filename)
-    G = ox.load_graphml(filename=graph_filepath, folder='')
+    G = ox.load_graphml(filepath=graph_filepath)
     print(ox.ts(), 'load', len(G.nodes()), 'nodes and', len(G.edges()), 'edges from', graph_filepath)
-    
+
     # add elevation and elevation resolution as new attributes to edges
     graph_elevations = elevations.loc[set(G.nodes())].sort_index()
     nx.set_node_attributes(G, name='elevation', values=graph_elevations['elev'])
     nx.set_node_attributes(G, name='elevation_res', values=graph_elevations['elev_res'])
-    
+
     # check if any graph node is missing elevation
     assert set(G.nodes()) == set(nx.get_node_attributes(G, 'elevation')) == set(nx.get_node_attributes(G, 'elevation_res'))
 
     # then calculate edge grades
     G = ox.add_edge_grades(G, add_absolute=True)
-    
+
     # resave graphml now that it has elevations/grades
-    graphml_output_folder = os.path.join(graphml_folder, country_folder)
-    ox.save_graphml(G, filename=graph_filename, folder=graphml_output_folder)
+    ox.save_graphml(G, filepath=graph_filepath)
     print(ox.ts(), 'save', graph_filepath)
-    
+
     # save node/edge lists
     uc_name = graph_filename.replace('.graphml', '')
     nelist_output_folder = os.path.join(nelist_folder, country_folder, uc_name)
     save_node_edge_lists(G, nelist_output_folder)
     print(ox.ts(), 'save', nelist_output_folder)
-    
+
     # save as geopackage
-    gpkg_output_folder = os.path.join(gpkg_folder, country_folder)
     gpkg_filename = uc_name + '.gpkg'
-    ox.save_graph_geopackage(G, folder=gpkg_output_folder, filename=gpkg_filename)
-    print(ox.ts(), 'save', gpkg_output_folder + '/' + gpkg_filename)
+    gpkg_filepath = os.path.join(gpkg_folder, country_folder, gpkg_filename)
+    ox.save_graph_geopackage(G, filepath=gpkg_filepath)
+    print(ox.ts(), 'save', gpkg_filepath)
 
 
 # In[ ]:
