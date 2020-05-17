@@ -109,7 +109,8 @@ for label, row in ucs_to_get.iterrows():
 
         #nelist_folder = '{}/{}-{}/{}-{}'.format(output_nelist_path, row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
 
-        if not os.path.exists('{}/{}'.format(graphml_folder, graphml_file)):
+        filepath = os.path.join(graphml_folder, graphml_file)
+        if not os.path.exists(filepath):
 
             # get graph
             print(ox.ts(), graph_name)
@@ -120,10 +121,10 @@ for label, row in ucs_to_get.iterrows():
                                       truncate_by_edge=truncate_by_edge)
 
             # don't save graphs if they have fewer than 3 nodes
-            if len(G.nodes()) > 2:
+            if len(G) > 2:
                 #save_node_edge_lists(G, nelist_folder) #do this later when we've got the elevations too
                 #ox.save_graph_geopackage(G, folder=gpkg_folder, filename=gpkg_file) #do this later when we've got the elevations too
-                ox.save_graphml(G, filepath=os.path.join(graphml_folder, graphml_file))
+                ox.save_graphml(G, filepath=filepath)
                 count_success = count_success + 1
             else:
                 count_small = count_small + 1

@@ -50,9 +50,13 @@ print(ox.ts(), 'loaded', len(nodes), 'node osmids to get elevations for')
 
 
 urls = pd.read_csv(urls_path, index_col='cluster')
+print(ox.ts(), 'there are', len(urls), 'urls to get')
+if len(urls) == 0:
+	exit()
+
+# make country and key cols
 urls['country'] = urls.index.str.slice(0, 3)
 urls['key'] = urls['url'].str.split('key=', expand=True)[1]
-print(ox.ts(), 'there are', len(urls), 'urls to get')
 
 
 # In[ ]:
