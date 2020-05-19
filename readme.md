@@ -64,14 +64,24 @@ For each country, open each saved graph's GraphML file. Load CSV of node ID elev
 
 #### 3.1 Calculate indicators
 
+Load each saved graph's GraphML file. Calculate each indicator as described in the indicators metadata file. Save the results to the `indicators-street.csv` file.
+
 #### 3.2. Merge indicators
 
+Merge the `indicators-street.csv` indicators with the urban centers indicators from the geopackage file described in 1.1. Save to disk with indicators named as described in the indicators metadata file.
+
 #### 3.3. Create metadata
+
+Create metadata files for the graph nodes, graph edges, and indicators.
 
 #### 3.4. Validation
 
 See validation notebook.
 
 ### 4. Upload repository
+
+#### 4.1. File checks
+
+Before staging files for repository deposit, ensure we have what we expect. Verify that we have the same number of countries for each file type, the same number of gpkg, graphml, and node/edge list files, and that the same set of country/city names exists across gkpg, graphml, and node/edge lists.
 
 ### 5. Analysis
