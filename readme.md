@@ -29,21 +29,36 @@ Uses OSMnx to download OSM data and construct into a MultiDiGraph of street netw
   - has >= 1 km2 built-up area
   - includes at least 3 nodes
 
-Save each graph to disk as a GraphML file at `data/models/graphml/country/city.graphml`
+Save each graph to disk as a GraphML file at `data/models/graphml/country/city.graphml`.
 
 ### 2. Attach elevation
 
 #### 2.1. Elevation extract nodes
 
-For each country, open each saved graph's GraphML file, extract the nodes' x and y coordinates and append to a DataFrame of all nodes for the country. Save all the node coordinates for each country to disk at 
+For each country, open each saved graph's GraphML file, extract the nodes' x and y coordinates and append to a DataFrame of all nodes for the country. Save all the node coordinates for each country to disk at `data/elevation/nodes/country-nodes/country.csv`.
 
 #### 2.2. Cluster nodes
 
+We want to send node coordinates to the elevation API in batches. But the batches need to consist of (approximately) adjacent nodes. The API uses a smoothing function to estimate elevation. If the nodes are from different parts of the planet (or at different elevations), this smoothing will result in very coarse-grained approximations of individual nodes' elevations. So, load all the node coordinates for each country and cluster (then subcluster) them via k-means to get them into spatial clusters no bigger than the max batch size via 4 steps:
+
+  1. Get the initial set of all country nodes into more manageably sized clusters. It's cpu/mem intensive to divide lots of points into lots of clusters, so this pass just divides lots of points into a few clusters.
+  2. Recursively subcluster the clusters to make the clusters small enough to be able to cluster into lots of sub-sub-clusters of batch size.
+  3. Now that the clusters are of a digestible size, subcluster them down to approximately the batch size.
+  4. k-means produces uneven cluster sizes so many will be bigger/smaller than the max batch size. If clustering produced clusters bigger than the max batch size, bissect them (by their currently longest axis) until the are below the batch size.
+
+Save all nodes for all countries in a single CSV file with osmid, x, y, and cluster label.
+
 #### 2.3. Prep URLs
+
+Load the CSV of node clusters and construct an API URL for each with a key.
 
 #### 2.4. Download elevations
 
+Get each URL one at a time. Save node ID + elevation to disk for all nodes in a CSV file.
+
 #### 2.5. Add elevation to nodes
+
+For each country, open each saved graph's GraphML file. Load CSV of node ID elevations. For each node in graph, add its elevation as new attribute. Calcute edge grades. Resave graph to disk as GraphML, then save as node/edge lists and GeoPackage.
 
 ### 3. Calculate indicators
 
@@ -52,6 +67,10 @@ For each country, open each saved graph's GraphML file, extract the nodes' x and
 #### 3.2. Merge indicators
 
 #### 3.3. Create metadata
+
+#### 3.4. Validation
+
+See validation notebook.
 
 ### 4. Upload repository
 
