@@ -29,9 +29,13 @@ Uses OSMnx to download OSM data and construct into a MultiDiGraph of street netw
   - has >= 1 km2 built-up area
   - includes at least 3 nodes
 
+Save each graph to disk as a GraphML file at `data/models/graphml/country/city.graphml`
+
 ### 2. Attach elevation
 
 #### 2.1. Elevation extract nodes
+
+For each country, open each saved graph's GraphML file, extract the nodes' x and y coordinates and append to a DataFrame of all nodes for the country. Save all the node coordinates for each country to disk at 
 
 #### 2.2. Cluster nodes
 
