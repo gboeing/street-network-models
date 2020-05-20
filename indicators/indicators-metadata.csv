@@ -1,0 +1,49 @@
+indicator,type,description
+country,string,Main country name
+country_iso,string,Main country ISO 3166-1 alpha-3 code
+core_city,string,Urban center core city name
+uc_id,int,Urban center unique ID
+circuity,float,Ratio of street lengths to straightline distances
+elev_iqr,float,"Interquartile range of node elevations, meters"
+elev_mean,float,"Mean node elevation, meters"
+elev_median,float,"Median node elevation, meters"
+elev_range,float,"Range of node elevations, meters"
+elev_std,float,"Standard deviation of node elevations, meter"
+elev_res_mean,float,Average spatial resolution of elevation calculation
+grade_mean,float,Mean absolute street grade (incline)
+grade_median,float,Median absolute street grade (incline)
+intersect_count,int,Count of (undirected) edge intersections
+intersect_count_clean,int,Count of street intersections (after merging nodes within 10m of each other)
+k_avg,float,Average node degree (undirected)
+length_mean,float,"Mean street segment length, meters"
+length_median,float,"Median street segment length, meters"
+m,int,Count of streets (undirected edges)
+n,int,Count of nodes
+orientation_entropy,float,Entropy of street network bearings
+orientation_order,float,Orientation order of street network bearings
+prop_4way,float,Proportion of nodes that represent 4-way street intersections
+prop_3way,float,Proportion of nodes that represent 3-way street intersections
+prop_deadend,float,Proportion of nodes that represent dead-ends
+straightness,float,1 / circuity
+uc_names,string,List of city names within this urban center (GISCO)
+world_region,string,Major geographical region (UN WUP)
+world_subregion,string,Geographical region (UN WUP)
+resident_pop,int,Total resident population in 2015 (GHS)
+area,float,"Area within urban center boundary polygon, km2 (GHS)"
+built_up_area,float,"Built-up surface area in 2015, km2 (GHS)"
+night_light_em,float,"Average nighttime light emission in 2015, nano-watts per steradian per cm2 (Weiss)"
+gdp_ppp,int,"Sum of GDP PPP values for 2015, in 2011 USD (Kummu)"
+un_income_class,string,UN income class (UNDESA)
+un_dev_group,string,UN development group (UNDESA)
+transport_co2_em_fossil,float,"Total transport-sector co2 emissions from non-short-cycle-organic fuels in 2015, 10^3 kg/year (Crippa)"
+transport_co2_em_bio,float,"Total transport-sector co2 emissions from short-cycle-organic fuels in 2015, 10^3 kg/year (Crippa)"
+transport_pm25_em,float,"Total transport-sector emissions of particular matter <2.5 microns in 2015, 10^3 kg/year (Crippa)"
+pm25_concentration,float,"Concentration of particular matter <2.5 microns for 2014, micrograms per cubic meter air (GBD)"
+climate_classes,string,Climate classes (Rubel)
+avg_elevation,float,"Average elevation, m above sea level (EORC and JAXA)"
+avg_precipitation,float,"Average precipitation for 2014, mm (Harris)"
+avg_temperature,float,"Average temperature for 2014, celsius (Harris)"
+land_use_efficiency,string,Land use efficiency 1990-2015 (Melchiorri)
+pct_open_space,float,Percent open space (JRC)
+centroid_lng,float,"Longitude of the area centroid, decimal degrees"
+centroid_lat,float,"Latitude of the area centroid, decimal degrees"
