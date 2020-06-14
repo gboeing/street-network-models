@@ -56,9 +56,8 @@ def subcluster(nodes, labels, n=None, size=batch_size):
     X = nodes.loc[labels, ['x', 'y']].values
     kmeans = KMeans(n_clusters=n,
                     init='k-means++',
-                    algorithm='elkan',
+                    algorithm='full',
                     n_init=10,
-                    n_jobs=10,
                     max_iter=300,
                     random_state=0)
 

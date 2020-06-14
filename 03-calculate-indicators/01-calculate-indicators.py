@@ -97,10 +97,10 @@ def calculate_circuity(G, edge_length_total):
     coords = np.array([[G.nodes[u]['y'], G.nodes[u]['x'], G.nodes[v]['y'], G.nodes[v]['x']] for u, v, k in G.edges(keys=True)])
     df_coords = pd.DataFrame(coords, columns=['u_y', 'u_x', 'v_y', 'v_x'])
 
-    gc_distances = ox.utils_geo.great_circle_vec(lat1=df_coords['u_y'],
-                                                 lng1=df_coords['u_x'],
-                                                 lat2=df_coords['v_y'],
-                                                 lng2=df_coords['v_x'])
+    gc_distances = ox.distance.great_circle_vec(lat1=df_coords['u_y'],
+                                                lng1=df_coords['u_x'],
+                                                lat2=df_coords['v_y'],
+                                                lng2=df_coords['v_x'])
 
     gc_distances = gc_distances.fillna(value=0)
     circuity_avg = edge_length_total / gc_distances.sum()
