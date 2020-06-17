@@ -13,7 +13,8 @@ elev_res_mean,float,Average spatial resolution of elevation calculation
 grade_mean,float,Mean absolute street grade (incline)
 grade_median,float,Median absolute street grade (incline)
 intersect_count,int,Count of (undirected) edge intersections
-intersect_count_clean,int,Count of street intersections (after merging nodes within 10m of each other)
+intersect_count_clean,int,Count of street intersections (after merging nodes within 10m of each other geometrically)
+intersect_count_clean_topo,int,Count of street intersections (after merging nodes within 10m of each other topologically)
 k_avg,float,Average node degree (undirected)
 length_mean,float,"Mean street segment length, meters"
 length_median,float,"Median street segment length, meters"

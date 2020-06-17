@@ -111,12 +111,21 @@ def intersection_counts(G, tolerance=clean_int_tol):
 
     node_ids = set(G.nodes())
     streets_per_node = G.graph['streets_per_node']
-    intersection_count = len([True for node, count in streets_per_node.items() if (count > 1) and (node in node_ids)])
-    intersection_count_clean = len(ox.consolidate_intersections(ox.project_graph(G),
-                                                                tolerance=tolerance,
-                                                                rebuild_graph=False,
-                                                                dead_ends=False))
-    return intersection_count, intersection_count_clean
+    intersect_count = len([True for node, count in streets_per_node.items() if (count > 1) and (node in node_ids)])
+
+    Gp = ox.project_graph(G)
+    intersect_count_clean = len(ox.consolidate_intersections(Gp,
+                                                             tolerance=tolerance,
+                                                             rebuild_graph=False,
+                                                             dead_ends=False))
+
+    intersect_count_clean_topo = len(ox.consolidate_intersections(Gp,
+                                                                  tolerance=tolerance,
+                                                                  rebuild_graph=True,
+                                                                  reconnect_edges=False,
+                                                                  dead_ends=False))
+
+    return intersect_count, intersect_count_clean, intersect_count_clean_topo
 
 
 # In[ ]:
@@ -174,35 +183,36 @@ def calculate_graph_indicators(filepath):
     grade_mean, grade_median, elev_mean, elev_median, elev_std, elev_range, elev_iqr, elev_res_mean = elevation_grades(Gu)
 
     # total and clean intersection counts
-    intersect_count, intersect_count_clean = intersection_counts(Gu)
+    intersect_count, intersect_count_clean, intersect_count_clean_topo = intersection_counts(Gu)
 
     # bearing/orientation entropy/order
     orientation_entropy = calculate_orientation_entropy(Gu)
     orientation_order = calculate_orientation_order(orientation_entropy)
 
     # assemble and return results as dict
-    return {'circuity'              : circuity,
-            'elev_iqr'              : elev_iqr,
-            'elev_mean'             : elev_mean,
-            'elev_median'           : elev_median,
-            'elev_range'            : elev_range,
-            'elev_std'              : elev_std,
-            'elev_res_mean'         : elev_res_mean,
-            'grade_mean'            : grade_mean,
-            'grade_median'          : grade_median,
-            'intersect_count'       : intersect_count,
-            'intersect_count_clean' : intersect_count_clean,
-            'k_avg'                 : k_avg,
-            'length_mean'           : length_mean,
-            'length_median'         : length_median,
-            'm'                     : m,
-            'n'                     : n,
-            'orientation_entropy'   : orientation_entropy,
-            'orientation_order'     : orientation_order,
-            'prop_4way'             : prop_4way,
-            'prop_3way'             : prop_3way,
-            'prop_deadend'          : prop_deadend,
-            'straightness'          : straightness}
+    return {'circuity'                   : circuity,
+            'elev_iqr'                   : elev_iqr,
+            'elev_mean'                  : elev_mean,
+            'elev_median'                : elev_median,
+            'elev_range'                 : elev_range,
+            'elev_std'                   : elev_std,
+            'elev_res_mean'              : elev_res_mean,
+            'grade_mean'                 : grade_mean,
+            'grade_median'               : grade_median,
+            'intersect_count'            : intersect_count,
+            'intersect_count_clean'      : intersect_count_clean,
+            'intersect_count_clean_topo' : intersect_count_clean_topo,
+            'k_avg'                      : k_avg,
+            'length_mean'                : length_mean,
+            'length_median'              : length_median,
+            'm'                          : m,
+            'n'                          : n,
+            'orientation_entropy'        : orientation_entropy,
+            'orientation_order'          : orientation_order,
+            'prop_4way'                  : prop_4way,
+            'prop_3way'                  : prop_3way,
+            'prop_deadend'               : prop_deadend,
+            'straightness'               : straightness}
 
 
 # In[ ]:
