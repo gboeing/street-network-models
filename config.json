@@ -16,5 +16,9 @@
     "elevation_nodestoget_path"   : "/data/wc/elevation/nodes/nodes-to-get.csv",
     "elevation_urls_path"         : "/data/wc/elevation/urls.csv",
     "elevation_elevations_path"   : "/data/wc/elevation/elevations.csv",
-    "staging_path"                : "/data/wc/staging"
+    "staging_gpkg_path"           : "/data/wc/staging/gpkg",
+    "staging_graphml_path"        : "/data/wc/staging/graphml",
+    "staging_nelist_path"         : "/data/wc/staging/nelist",
+    "staging_indicators_path"     : "/data/wc/staging/indicators",
+    "staging_metadata_path"       : "/data/wc/staging/metadata"
 }
