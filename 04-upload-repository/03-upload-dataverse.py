@@ -1,20 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Upload to Dataverse
-#
-#
-# Using the dataverse native and sword APIs. Log into https://dataverse.harvard.edu to create an API key.
-#
-#   - Create a draft dataset revision on the dataverse (edit > edit metadata > change something > save)
-#   - Run this notebook
-#   - Visit dataverse and publish the revised draft
-#
-# The sword api is needed to delete files as this hasn't been implemented in the native api yet. The native api handles all the file uploading and metadata (that the sword only offers limited support for).
-#
-#   - sword api: http://guides.dataverse.org/en/4.8.6/api/sword.html#delete-a-file-by-database-id
-#   - native api: http://guides.dataverse.org/en/4.8.6/api/native-api.html
-
 # In[ ]:
 
 

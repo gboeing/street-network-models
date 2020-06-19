@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ## Zip all data files into a staging area for upload to Dataverse
-
 # In[ ]:
 
 
