@@ -84,4 +84,23 @@ See validation notebook.
 
 Before staging files for repository deposit, ensure we have what we expect. Verify that we have the same number of countries for each file type, the same number of gpkg, graphml, and node/edge list files, and that the same set of country/city names exists across gkpg, graphml, and node/edge lists.
 
+#### 4.2. Stage files
+
+Compress and zip all model files (geopackages, graphml, node/edge lists) into a staging area for upload to Dataverse.
+
+#### 4.3. Upload dataverse
+
+Upload to Dataverse using their [native](http://guides.dataverse.org/en/latest/api/native-api.html) and [sword](http://guides.dataverse.org/en/latest/api/sword.html) APIs. First [log in](https://dataverse.harvard.edu) and create an API key if you don't have an active one (they expire annually). If this is a revision to the datasets, create a draft dataset revision on the dataverse (edit > edit metadata > change something > save). Otherwise, if this is the first file upload, create a new dataverse and new empty datasets within it, structured like:
+
+  - Global Urban Street Networks
+      - Global Urban Street Networks GeoPackages
+      - Global Urban Street Networks GraphML Files
+      - Global Urban Street Networks Node/Edge Lists
+      - Global Urban Street Networks Indicators
+      - Global Urban Street Networks Metadata
+
+Then run the script to upload all the model files to their respect datasets in the dataverse (note, if this a revision, edit the script to set `delete_existing_files = True` to first clear out all the carried over files in the draft. Next, manually upload the indicators files and the metadata files to their respective datasets in the dataverse. Finally, visit the dataverse on the web to publish the revised draft.
+
+Note that the sword API is just needed to delete files, as this hasn't been implemented in the native API yet as of this writing. The native API handles all the file uploading and metadata (that the sword API only offers limited support for).
+
 ### 5. Analysis
