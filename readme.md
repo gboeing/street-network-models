@@ -99,8 +99,8 @@ Upload to Dataverse using their [native](http://guides.dataverse.org/en/latest/a
       - Global Urban Street Networks Indicators
       - Global Urban Street Networks Metadata
 
-Then run the script to upload all the model files to their respect datasets in the dataverse (note, if this a revision, edit the script to set `delete_existing_files = True` to first clear out all the carried over files in the draft. Next, manually upload the indicators files and the metadata files to their respective datasets in the dataverse. Finally, visit the dataverse on the web to publish the revised draft.
+Then run the script to upload all the model files automatically to their respective datasets in the dataverse (note, if this a dataset revision, edit the script to set `delete_existing_files = True` to first clear out all the carried over files in the draft). Next, manually upload the indicators files and the metadata files to their respective datasets in the dataverse. Finally, visit the dataverse on the web to publish the draft.
 
-Note that the sword API is just needed to delete files, as this hasn't been implemented in the native API yet as of this writing. The native API handles all the file uploading and metadata (that the sword API only offers limited support for).
+Note that the sword API is just needed to delete files, as this hasn't been implemented in the native API yet as of this writing. The native API handles all the file uploading and metadata (which the sword API only offers limited support for).
 
 ### 5. Analysis
