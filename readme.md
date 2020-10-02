@@ -1,6 +1,6 @@
 # World Cities Street Network Analysis
 
-This project models and analyzes the street networks of every urban area in the world. It produces open data repositories of the street network models and the indicators.
+This project models and analyzes the street networks of every urban area in the world. It produces open data repositories of the street network models and the indicators: https://dataverse.harvard.edu/dataverse/global-urban-street-networks
 
 
 ## Input data
