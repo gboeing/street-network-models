@@ -20,7 +20,8 @@ with open('../config.json') as f:
 
 uc_gpkg_path = config['uc_gpkg_path'] #prepped urban centers dataset
 indicators_street_path = config['indicators_street_path'] #street network indicators to load
-indicators_path = config['indicators_path'] #merged indicators to save
+indicators_path = config['indicators_path'] #merged indicators to save for repo upload
+indicators_all_path = config['indicators_all_path'] #all merged indicators to save for analysis
 
 
 # In[ ]:
@@ -82,9 +83,18 @@ df = df[cols_keep]
 print(ox.ts(), 'finished indicators, dataset has shape', df.shape)
 
 
-# In[ ]:
+
+df.to_csv(indicators_all_path, index=False, encoding='utf-8')
+print(ox.ts(), 'saved all indicators to disk', indicators_all_path)
 
 
+# drop columns that should not go in our repo then save
+drop = ['night_light_em', 'gdp_ppp', 'un_income_class', 'un_dev_group',
+        'transport_co2_em_fossil', 'transport_co2_em_bio', 'transport_pm25_em',
+        'pm25_concentration', 'climate_classes', 'avg_elevation', 'avg_precipitation',
+        'avg_temperature', 'land_use_efficiency', 'pct_open_space', 'centroid_lat',
+        'centroid_lng']
+df = df.drop(columns=drop)
+print(ox.ts(), 'repo indicators dataset has shape', df.shape)
 df.to_csv(indicators_path, index=False, encoding='utf-8')
-print(ox.ts(), 'saved indicators to disk', indicators_path)
-
+print(ox.ts(), 'saved repo indicators to disk', indicators_path)

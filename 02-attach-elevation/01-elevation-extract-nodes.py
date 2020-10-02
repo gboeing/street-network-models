@@ -27,7 +27,7 @@ ox.config(log_file=True, logs_folder=config['osmnx_log_path'])
 
 
 graphml_folder = config['models_graphml_path']
-nodes_folder = config['elevation_nodes_path']
+nodes_folder = config['elevation_country_nodes_path']
 
 
 # In[ ]:

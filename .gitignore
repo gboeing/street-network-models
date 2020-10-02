@@ -1,5 +1,7 @@
 *keys.json
-indicators/temp/*
+indicators/*
+05-analysis/*
+paper/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

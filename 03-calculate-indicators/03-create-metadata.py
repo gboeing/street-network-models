@@ -17,8 +17,9 @@ from collections import OrderedDict
 with open('../config.json') as f:
     config = json.load(f)
 
-indicators_path = config['indicators_path'] #indicators data
-indicators_metadata_path = config['indicators_metadata_path'] #output indicators metadata
+indicators_path = config['indicators_all_path'] #all indicators data
+indicators_metadata_path = config['indicators_metadata_path'] #output indicators metadata (subset for repo)
+indicators_all_metadata_path = config['indicators_all_metadata_path'] #output indicators metadata (all for analysis)
 nodes_metadata_path = config['models_metadata_nodes_path'] #output graph nodes metadata
 edges_metadata_path = config['models_metadata_edges_path'] #output graph edges metadata
 
@@ -152,13 +153,21 @@ metadata = metadata.merge(right=dtypes, left_index=True, right_index=True).reind
 # make sure all the indicators are present in the metadata
 assert (metadata.index == ind.columns).all()
 
-# save metadata to disk
-metadata = metadata.reset_index().rename(columns={'index':'indicator'})
+# save all metadata to disk
+metadata_all = metadata.reset_index().rename(columns={'index':'indicator'})
+metadata_all.to_csv(indicators_all_metadata_path, index=False, encoding='utf-8')
+print(ox.ts(), 'saved all indicator metadata to disk', indicators_all_metadata_path)
+
+
+# drop fields that should not go in our repo then save
+drop = ['night_light_em', 'gdp_ppp', 'un_income_class', 'un_dev_group',
+        'transport_co2_em_fossil', 'transport_co2_em_bio', 'transport_pm25_em',
+        'pm25_concentration', 'climate_classes', 'avg_elevation', 'avg_precipitation',
+        'avg_temperature', 'land_use_efficiency', 'pct_open_space', 'centroid_lat',
+        'centroid_lng']
+metadata = metadata.drop(labels=drop).reset_index().rename(columns={'index':'indicator'})
 metadata.to_csv(indicators_metadata_path, index=False, encoding='utf-8')
-print(ox.ts(), 'saved indicator metadata to disk', indicators_metadata_path)
-
-
-# In[ ]:
+print(ox.ts(), 'saved repo indicator metadata to disk', indicators_metadata_path)
 
 
 
