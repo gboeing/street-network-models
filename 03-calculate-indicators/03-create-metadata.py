@@ -17,8 +17,9 @@ from collections import OrderedDict
 with open('../config.json') as f:
     config = json.load(f)
 
-indicators_path = config['indicators_path'] #indicators data
-indicators_metadata_path = config['indicators_metadata_path'] #output indicators metadata
+indicators_path = config['indicators_all_path'] #all indicators data
+indicators_metadata_path = config['indicators_metadata_path'] #output indicators metadata (subset for repo)
+indicators_all_metadata_path = config['indicators_all_metadata_path'] #output indicators metadata (all for analysis)
 nodes_metadata_path = config['models_metadata_nodes_path'] #output graph nodes metadata
 edges_metadata_path = config['models_metadata_edges_path'] #output graph edges metadata
 
@@ -34,9 +35,7 @@ desc['x']             = {'description' : 'Longitude coordinate (epsg 4326)',
                          'type'        : 'float'}
 desc['y']             = {'description' : 'Latitude coordinate (epsg 4326)',
                          'type'        : 'float'}
-desc['elevation']     = {'description' : 'Node elevation (meters above sea level)',
-                         'type'        : 'float'}
-desc['elevation_res'] = {'description' : 'Spatial resolution of elevation calculation',
+desc['elevation']     = {'description' : 'Node elevation (meters above sea level) from ASTER or SRTM',
                          'type'        : 'float'}
 desc['other attributes'] = {'description' : 'As defined in OSM documentation',
                             'type'        : ''}
@@ -94,17 +93,17 @@ desc['elev_mean'] = 'Mean node elevation, meters'
 desc['elev_median'] = 'Median node elevation, meters'
 desc['elev_range'] = 'Range of node elevations, meters'
 desc['elev_std'] = 'Standard deviation of node elevations, meter'
-desc['elev_res_mean'] = 'Average spatial resolution of elevation calculation'
 desc['grade_mean'] = 'Mean absolute street grade (incline)'
 desc['grade_median'] = 'Median absolute street grade (incline)'
 desc['intersect_count'] = 'Count of (undirected) edge intersections'
 desc['intersect_count_clean'] = 'Count of street intersections (after merging nodes within 10m of each other geometrically)'
 desc['intersect_count_clean_topo'] = 'Count of street intersections (after merging nodes within 10m of each other topologically)'
 desc['k_avg'] = 'Average node degree (undirected)'
-desc['length_mean'] = 'Mean street segment length, meters'
-desc['length_median'] = 'Median street segment length, meters'
-desc['m'] = 'Count of streets (undirected edges)'
-desc['n'] = 'Count of nodes'
+desc['length_mean'] = 'Mean street segment length (undirected edges), meters'
+desc['length_median'] = 'Median street segment length (undirected edges), meters'
+desc['length_total'] = 'Total street length (undirected edges), meters'
+desc['street_segment_count'] = 'Count of streets (undirected edges)'
+desc['node_count'] = 'Count of nodes'
 desc['orientation_entropy'] = 'Entropy of street network bearings'
 desc['orientation_order'] = 'Orientation order of street network bearings'
 desc['prop_4way'] = 'Proportion of nodes that represent 4-way street intersections'
@@ -152,13 +151,21 @@ metadata = metadata.merge(right=dtypes, left_index=True, right_index=True).reind
 # make sure all the indicators are present in the metadata
 assert (metadata.index == ind.columns).all()
 
-# save metadata to disk
-metadata = metadata.reset_index().rename(columns={'index':'indicator'})
+# save all metadata to disk
+metadata_all = metadata.reset_index().rename(columns={'index':'indicator'})
+metadata_all.to_csv(indicators_all_metadata_path, index=False, encoding='utf-8')
+print(ox.ts(), 'saved all indicator metadata to disk', indicators_all_metadata_path)
+
+
+# drop fields that should not go in our repo then save
+drop = ['night_light_em', 'gdp_ppp', 'un_income_class', 'un_dev_group',
+        'transport_co2_em_fossil', 'transport_co2_em_bio', 'transport_pm25_em',
+        'pm25_concentration', 'climate_classes', 'avg_elevation', 'avg_precipitation',
+        'avg_temperature', 'land_use_efficiency', 'pct_open_space', 'centroid_lat',
+        'centroid_lng']
+metadata = metadata.drop(labels=drop).reset_index().rename(columns={'index':'indicator'})
 metadata.to_csv(indicators_metadata_path, index=False, encoding='utf-8')
-print(ox.ts(), 'saved indicator metadata to disk', indicators_metadata_path)
-
-
-# In[ ]:
+print(ox.ts(), 'saved repo indicator metadata to disk', indicators_metadata_path)
 
 
 

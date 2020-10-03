@@ -27,7 +27,7 @@ ox.config(log_file=True,
           logs_folder=config['osmnx_log_path'])
 
 graphml_folder = config['models_graphml_path'] #where to load graphml files
-indicators_street_path = config['indicators_street_path']    #where to save output street network indicators
+indicators_street_path = config['indicators_street_path'] #where to save output street network indicators
 save_every_n = 100 #save results every n cities
 
 indicators_folder = indicators_street_path[:indicators_street_path.rfind('/')]
@@ -92,7 +92,7 @@ def calculate_orientation_order(orientation_entropy, entropy_bins=entropy_bins, 
 # In[ ]:
 
 
-def calculate_circuity(G, edge_length_total):
+def calculate_circuity(G, length_total):
 
     coords = np.array([[G.nodes[u]['y'], G.nodes[u]['x'], G.nodes[v]['y'], G.nodes[v]['x']] for u, v, k in G.edges(keys=True)])
     df_coords = pd.DataFrame(coords, columns=['u_y', 'u_x', 'v_y', 'v_x'])
@@ -103,23 +103,22 @@ def calculate_circuity(G, edge_length_total):
                                                 lng2=df_coords['v_x'])
 
     gc_distances = gc_distances.fillna(value=0)
-    circuity_avg = edge_length_total / gc_distances.sum()
+    circuity_avg = length_total / gc_distances.sum()
     return circuity_avg
 
 
-def intersection_counts(G, tolerance=clean_int_tol):
+def intersection_counts(Gu, tolerance=clean_int_tol):
 
-    node_ids = set(G.nodes())
-    streets_per_node = G.graph['streets_per_node']
-    intersect_count = len([True for node, count in streets_per_node.items() if (count > 1) and (node in node_ids)])
+    node_ids = set(Gu.nodes())
+    intersect_count = len([True for node, count in Gu.graph['streets_per_node'].items() if (count > 1) and (node in node_ids)])
 
-    Gp = ox.project_graph(G)
-    intersect_count_clean = len(ox.consolidate_intersections(Gp,
+    Gup = ox.project_graph(Gu)
+    intersect_count_clean = len(ox.consolidate_intersections(Gup,
                                                              tolerance=tolerance,
                                                              rebuild_graph=False,
                                                              dead_ends=False))
 
-    intersect_count_clean_topo = len(ox.consolidate_intersections(Gp,
+    intersect_count_clean_topo = len(ox.consolidate_intersections(Gup,
                                                                   tolerance=tolerance,
                                                                   rebuild_graph=True,
                                                                   reconnect_edges=False,
@@ -136,11 +135,10 @@ def elevation_grades(G):
 
     grades = pd.Series(nx.get_edge_attributes(G, 'grade_abs'))
     elevs = pd.Series(nx.get_node_attributes(G, 'elevation'))
-    elev_res_mean = pd.Series(nx.get_node_attributes(G, 'elevation_res')).mean()
     elev_iqr = elevs.quantile(0.75) - elevs.quantile(0.25)
     elev_range = elevs.max() - elevs.min()
 
-    return grades.mean(), grades.median(), elevs.mean(), elevs.median(), elevs.std(), elev_range, elev_iqr, elev_res_mean
+    return grades.mean(), grades.median(), elevs.mean(), elevs.median(), elevs.std(), elev_range, elev_iqr
 
 
 # In[ ]:
@@ -160,8 +158,9 @@ def calculate_graph_indicators(filepath):
 
     Gu = ox.get_undirected(ox.load_graphml(filepath=filepath))
 
-    # street lengths,
+    # street lengths
     lengths = pd.Series(nx.get_edge_attributes(Gu, 'length'))
+    length_total = lengths.sum()
     length_median = lengths.median()
     length_mean = lengths.mean()
 
@@ -176,11 +175,11 @@ def calculate_graph_indicators(filepath):
     prop_deadend = list(Gu.graph['streets_per_node'].values()).count(1) / len(Gu.nodes())
 
     # average circuity and straightness
-    circuity = calculate_circuity(Gu, lengths.sum())
+    circuity = calculate_circuity(Gu, length_total)
     straightness = 1 / circuity
 
     # elevation and grade
-    grade_mean, grade_median, elev_mean, elev_median, elev_std, elev_range, elev_iqr, elev_res_mean = elevation_grades(Gu)
+    grade_mean, grade_median, elev_mean, elev_median, elev_std, elev_range, elev_iqr = elevation_grades(Gu)
 
     # total and clean intersection counts
     intersect_count, intersect_count_clean, intersect_count_clean_topo = intersection_counts(Gu)
@@ -196,7 +195,6 @@ def calculate_graph_indicators(filepath):
             'elev_median'                : elev_median,
             'elev_range'                 : elev_range,
             'elev_std'                   : elev_std,
-            'elev_res_mean'              : elev_res_mean,
             'grade_mean'                 : grade_mean,
             'grade_median'               : grade_median,
             'intersect_count'            : intersect_count,
@@ -205,8 +203,9 @@ def calculate_graph_indicators(filepath):
             'k_avg'                      : k_avg,
             'length_mean'                : length_mean,
             'length_median'              : length_median,
-            'm'                          : m,
-            'n'                          : n,
+            'length_total'               : length_total,
+            'street_segment_count'       : m,
+            'node_count'                 : n,
             'orientation_entropy'        : orientation_entropy,
             'orientation_order'          : orientation_order,
             'prop_4way'                  : prop_4way,
