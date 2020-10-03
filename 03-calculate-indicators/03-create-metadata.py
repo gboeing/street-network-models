@@ -35,9 +35,7 @@ desc['x']             = {'description' : 'Longitude coordinate (epsg 4326)',
                          'type'        : 'float'}
 desc['y']             = {'description' : 'Latitude coordinate (epsg 4326)',
                          'type'        : 'float'}
-desc['elevation']     = {'description' : 'Node elevation (meters above sea level)',
-                         'type'        : 'float'}
-desc['elevation_res'] = {'description' : 'Spatial resolution of elevation calculation',
+desc['elevation']     = {'description' : 'Node elevation (meters above sea level) from ASTER or SRTM',
                          'type'        : 'float'}
 desc['other attributes'] = {'description' : 'As defined in OSM documentation',
                             'type'        : ''}
@@ -95,17 +93,17 @@ desc['elev_mean'] = 'Mean node elevation, meters'
 desc['elev_median'] = 'Median node elevation, meters'
 desc['elev_range'] = 'Range of node elevations, meters'
 desc['elev_std'] = 'Standard deviation of node elevations, meter'
-desc['elev_res_mean'] = 'Average spatial resolution of elevation calculation'
 desc['grade_mean'] = 'Mean absolute street grade (incline)'
 desc['grade_median'] = 'Median absolute street grade (incline)'
 desc['intersect_count'] = 'Count of (undirected) edge intersections'
 desc['intersect_count_clean'] = 'Count of street intersections (after merging nodes within 10m of each other geometrically)'
 desc['intersect_count_clean_topo'] = 'Count of street intersections (after merging nodes within 10m of each other topologically)'
 desc['k_avg'] = 'Average node degree (undirected)'
-desc['length_mean'] = 'Mean street segment length, meters'
-desc['length_median'] = 'Median street segment length, meters'
-desc['m'] = 'Count of streets (undirected edges)'
-desc['n'] = 'Count of nodes'
+desc['length_mean'] = 'Mean street segment length (undirected edges), meters'
+desc['length_median'] = 'Median street segment length (undirected edges), meters'
+desc['length_total'] = 'Total street length (undirected edges), meters'
+desc['street_segment_count'] = 'Count of streets (undirected edges)'
+desc['node_count'] = 'Count of nodes'
 desc['orientation_entropy'] = 'Entropy of street network bearings'
 desc['orientation_order'] = 'Orientation order of street network bearings'
 desc['prop_4way'] = 'Proportion of nodes that represent 4-way street intersections'
