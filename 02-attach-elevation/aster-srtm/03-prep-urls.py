@@ -16,7 +16,7 @@ print('osmnx version', ox.__version__)
 
 # In[ ]:
 
-# load google maps elevation api keys
+# load geonames api username
 with open('keys.json') as f:
     data = json.load(f)
     username = data['username']
@@ -40,7 +40,7 @@ nodestoget_path = config['elevation_aster_nodestoget_path'] #node osmids in same
 
 
 def get_url(cluster, username=username):
-    # google maps elevation API endpoint
+    # geonames aster elevation API endpoint
     url_template = 'http://ws.geonames.net/astergdemJSON?lats={}&lngs={}&username={}'
     lats = ','.join(cluster['lat'])
     lngs = ','.join(cluster['lng'])
