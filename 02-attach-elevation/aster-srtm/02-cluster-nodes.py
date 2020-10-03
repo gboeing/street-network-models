@@ -21,7 +21,7 @@ print('osmnx version', ox.__version__)
 
 
 # load configs
-with open('../config.json') as f:
+with open('../../config.json') as f:
     config = json.load(f)
 
 max_cluster_input_size = 90000
