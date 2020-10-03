@@ -19,7 +19,7 @@ print('osmnx version', ox.__version__)
 
 
 # load configs
-with open('../config.json') as f:
+with open('../../config.json') as f:
     config = json.load(f)
 
 ox.config(use_cache=True,
@@ -100,7 +100,7 @@ print(ox.ts(), 'will get', total_count_cached, 'urls from cache and', total_coun
 def request_url(url, pause_duration=pause_duration):
 
     # check if this request is already in the cache (if ox.settings.use_cache=True)
-    cached_response_json = ox.downloader._get_from_cache(url)
+    cached_response_json = ox.downloader._retrieve_from_cache(url)
     if cached_response_json is not None:
         response_json = cached_response_json
         ox.log('Got node elevations from cache')

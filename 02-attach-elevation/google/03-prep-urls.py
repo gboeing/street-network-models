@@ -30,7 +30,7 @@ with open('keys.json') as f:
     api_keys = data['api_keys']
 
 # load configs
-with open('../config.json') as f:
+with open('../../config.json') as f:
     config = json.load(f)
 
 batch_size = 400
