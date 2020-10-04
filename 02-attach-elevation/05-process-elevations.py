@@ -121,7 +121,7 @@ df['elevation'] = df['elevation'].astype(int)
 
 
 # save elevations to disk for subsequent attaching to graph file's nodes
-cols = ['elevation', 'elev_aster', 'elev_srtm']
+cols = ['elevation', 'elev_aster', 'elev_srtm', 'elev_google']
 df[cols].to_csv(config['elevation_final_path'], index=True, encoding='utf-8')
 print(ox.ts(), 'saved', len(df), 'elevations to disk at', config['elevation_final_path'])
 
