@@ -5,6 +5,7 @@
 
 
 import json
+import multiprocessing as mp
 import os
 import osmnx as ox
 import zipfile
@@ -23,6 +24,8 @@ manifest = [{'input': config['models_gpkg_path'],    'output': config['staging_g
             {'input': config['models_nelist_path'],  'output': config['staging_nelist_path']}]
 
 
+cpus = mp.cpu_count()
+
 # In[ ]:
 
 
@@ -31,10 +34,7 @@ def zip_dir(input_path, output_folder, output_file):
 
     output_path = os.path.join(output_folder, output_file)
     if not os.path.exists(output_path):
-
         print(ox.ts(), input_path, output_path)
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
 
         # create a zip file to contain all the files from the input path
         zf = zipfile.ZipFile(file=output_path, mode='w', compression=zipfile.ZIP_DEFLATED)
@@ -57,13 +57,31 @@ def zip_dir(input_path, output_folder, output_file):
 # In[ ]:
 
 
-print(ox.ts(), 'begin compressing and staging files')
+print(ox.ts(), f'begin compressing and staging files using {cpus} CPUs')
+
+params = []
 for item in manifest:
+
+    output_folder = item['output']
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
     for country_folder in sorted(os.listdir(item['input'])):
         input_path = os.path.join(item['input'], country_folder)
-        output_folder = item['output']
         output_file = country_folder + '.zip'
-        zip_dir(input_path, output_folder, output_file)
+        params.append((input_path, output_folder, output_file))
+
+# create a pool of worker processes
+pool = mp.Pool(cpus)
+
+# map the function/parameters to the worker processes
+sma = pool.starmap_async(zip_dir, params)
+
+# get the results, close the pool, wait for worker processes to all exit
+sma.get()
+pool.close()
+pool.join()
+
 print(ox.ts(), 'finished compressing and staging files')
 
 
