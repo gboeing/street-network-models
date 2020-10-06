@@ -18,7 +18,7 @@ from collections import OrderedDict
 # In[ ]:
 
 
-delete_existing_files = False #only make true on the first run to clear out everything from the draft
+delete_existing_files = True #only make true on the first run to clear out everything from the draft
 debug_mode = False
 
 
@@ -36,7 +36,7 @@ with open('keys.json') as f:
 api_key = keys['dataverse_api_key']
 
 # configure the dataverse upload
-server = 'https://dataverse.harvard.edu'
+host = 'https://dataverse.harvard.edu'
 attempts_max = 3      #how many times to re-try same file upload after error before giving up
 pause_error = 10      #seconds to pause after an error
 pause_normal = 0      #seconds to pause between uploads
@@ -128,7 +128,7 @@ def upload_new_file(folder, filename, doi, file_desc, file_tags, attempt_count=1
 
     # set up the api endpoint, open the file, and make the payload
     endpoint = f'api/v1/datasets/:persistentId/add?persistentId={doi}&key={api_key}'
-    url = f'{server}/{endpoint}'
+    url = f'{host}/{endpoint}'
     file, md5 = get_file_to_upload(file_path)
     payload = get_payload_to_upload(file_desc, file_tags, filename)
 
@@ -182,7 +182,7 @@ def upload_new_file(folder, filename, doi, file_desc, file_tags, attempt_count=1
 def get_uploaded_draft_filenames(doi):
 
     endpoint = f'api/v1/datasets/:persistentId/versions/:draft/files?key={api_key}&persistentId={doi}'
-    url = os.path.join(server, endpoint)
+    url = os.path.join(host, endpoint)
     response = requests.get(url)
     response_json = response.json()
 
@@ -202,7 +202,7 @@ def get_uploaded_draft_filenames(doi):
 def get_published_files(doi):
 
     endpoint = f'api/v1/datasets/:persistentId/versions/:latest-published/files?key={api_key}&persistentId={doi}'
-    url = os.path.join(server, endpoint)
+    url = os.path.join(host, endpoint)
     response = requests.get(url)
     response_json = response.json()
 
