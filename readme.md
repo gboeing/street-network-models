@@ -7,7 +7,7 @@ This project models and analyzes the street networks of every urban area in the 
 
 This project uses the GHSL urban clusters dataset to define the world's urban areas' boundary polygons.
 
-Create a `/data` root folder with a `inputs` subfolder and place the following unzipped data inside it: http://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_STAT_UCDB2015MT_GLOBE_R2019A/V1-2/GHS_STAT_UCDB2015MT_GLOBE_R2019A.zip
+Create a project data root folder with a `inputs` subfolder and place the following unzipped data inside it: http://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_STAT_UCDB2015MT_GLOBE_R2019A/V1-2/GHS_STAT_UCDB2015MT_GLOBE_R2019A.zip
 
 Urban boundaries dataset citation: Florczyk, A.J., Corbane, C., Schiavina, M., Pesaresi, M., Maffenini, L., Melchiorri, M., Politis, P., Sabo, F., Freire, S., Ehrlich, D., Kemper, T., Tommasi, P., Airaghi, D. and L. Zanchetta. 2019. GHS Urban Centre Database 2015, multitemporal and multidimensional attributes, R2019A. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/53473144-b88c-44bc-b4a3-4583ed1f547e
 
@@ -22,9 +22,13 @@ The workflow is organized into folders and scripts.
 
 Load the GHS urban centers dataset, retain useful columns, save as a geopackage file at `/data/inputs/ucs.gpkg`
 
-#### 1.2. Download graphs
+#### 1.2. Download cache
 
-Uses OSMnx to download OSM data and construct into a MultiDiGraph of street network. Saves to disk as GraphML. Parameterized to get only drivable streets, retain all, simplify, and truncate by edge. Does this for every urban center's polygon boundary if it meets the following conditions:
+Uses OSMnx to download OSM raw data to a cache for subsequent (multi-)processing.
+
+#### 1.3. Create graphs
+
+Use cached OSM raw data to construct a MultiDiGraph of street network. Can be done in parallel with multiprocessing by changing `cpus` config setting. Saves to disk as GraphML. Parameterized to get only drivable streets, retain all, simplify, and truncate by edge. Does this for every urban center's polygon boundary if it meets the following conditions:
 
   - is marked true positive in urban centers data set
   - has >= 1 km2 built-up area
