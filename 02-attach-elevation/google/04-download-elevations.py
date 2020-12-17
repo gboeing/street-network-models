@@ -112,7 +112,7 @@ def request_url(url, pause_duration=pause_duration):
             response = requests.get(url)
             assert response.ok
             response_json = response.json()
-            ox.downloader._save_to_cache(url, response_json)
+            ox.downloader._save_to_cache(url, response_json, response.status_code)
         except Exception as e:
             ox.log(e)
             print('Error - server responded with {}: {}'.format(response.status_code, response.reason))

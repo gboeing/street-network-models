@@ -7,6 +7,7 @@ import datetime
 import geopandas as gpd
 import json
 import logging as lg
+import multiprocessing as mp
 import networkx as nx
 import os
 import osmnx as ox
@@ -35,6 +36,12 @@ ox.config(use_cache=True,
           log_console=False,
           logs_folder=config['osmnx_log_path'],
           cache_folder=config['osmnx_cache_path'])
+
+if config['cpus'] == 0:
+    cpus = mp.cpu_count()
+else:
+    cpus = config['cpus']
+print(ox.ts(), 'using', cpus, 'CPUs')
 
 
 # In[ ]:
@@ -89,7 +96,7 @@ print(ox.ts(), 'retained >=1 km2 built-up area urban centers dataset with shape'
 # In[ ]:
 
 
-ucs_to_get = ucs#[ucs['ID_HDC_G0']==10]#.head(10)
+ucs_to_get = ucs.sample(len(ucs))#[ucs['ID_HDC_G0']==10]#.head(10)
 start_time = time.time()
 count_failed = 0
 count_success = 0
@@ -99,19 +106,20 @@ failed_list = []
 
 
 # In[ ]:
-print(ox.ts(), 'begin getting', len(ucs_to_get), 'graphs')
 
-for label, row in ucs_to_get.iterrows():
+def get_graph(row):
+
+    global count_failed
+    global count_success
+    global count_already
+    global count_small
+    global failed_list
+
     try:
         # graph name = country + country iso + uc + uc id
         graph_name = '{}-{}-{}-{}'.format(row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
         graphml_folder = '{}/{}-{}'.format(output_graphml_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
         graphml_file = '{}-{}.graphml'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
-
-        #gpkg_folder = '{}/{}-{}'.format(output_gpkg_path, row['CTR_MN_NM'], row['CTR_MN_ISO'])
-        #gpkg_file = '{}-{}.gpkg'.format(row['UC_NM_MN'], row['ID_HDC_G0'])
-
-        #nelist_folder = '{}/{}-{}/{}-{}'.format(output_nelist_path, row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
 
         filepath = os.path.join(graphml_folder, graphml_file)
         if not os.path.exists(filepath):
@@ -126,8 +134,6 @@ for label, row in ucs_to_get.iterrows():
 
             # don't save graphs if they have fewer than 3 nodes
             if len(G) > 2:
-                #save_node_edge_lists(G, nelist_folder) #do this later when we've got the elevations too
-                #ox.save_graph_geopackage(G, folder=gpkg_folder, filename=gpkg_file) #do this later when we've got the elevations too
                 ox.save_graphml(G, filepath=filepath)
                 count_success = count_success + 1
             else:
@@ -139,10 +145,33 @@ for label, row in ucs_to_get.iterrows():
         count_failed = count_failed + 1
         failed_list.append(graph_name)
         ox.log('"{}" failed: {}'.format(graph_name, e), level=lg.ERROR)
-        print(e)
+        print(e, graph_name)
 
 
 # In[ ]:
+
+print(ox.ts(), 'begin getting', len(ucs_to_get), 'graphs')
+
+# create function parameters for multiprocessing
+col_names = ucs_to_get.columns.to_list()
+params = ((dict(zip(col_names, values)),) for values in ucs_to_get.values)
+
+if cpus > 1:
+    # create a pool of worker processes then map function/parameters to them
+    pool = mp.Pool(cpus)
+    sma = pool.starmap_async(get_graph, list(params))
+
+    # get the results, close the pool, wait for worker processes to all exit
+    results = sma.get()
+    pool.close()
+    pool.join()
+
+else:
+    # global vars only work in single-processing mode here
+    # you can run this script one more time when you're done with cpus=1 to
+    # get non-zero counts of what happened below
+    for param_tuple in params:
+        get_graph(param_tuple[0])
 
 
 end_time = time.time() - start_time

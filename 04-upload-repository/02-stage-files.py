@@ -23,8 +23,11 @@ manifest = [{'input': config['models_gpkg_path'],    'output': config['staging_g
             {'input': config['models_graphml_path'], 'output': config['staging_graphml_path']},
             {'input': config['models_nelist_path'],  'output': config['staging_nelist_path']}]
 
-
-cpus = mp.cpu_count()
+if config['cpus'] == 0:
+    cpus = mp.cpu_count()
+else:
+    cpus = config['cpus']
+print(ox.ts(), 'using', cpus, 'CPUs')
 
 # In[ ]:
 
@@ -37,7 +40,7 @@ def zip_dir(input_path, output_folder, output_file):
         print(ox.ts(), input_path, output_path)
 
         # create a zip file to contain all the files from the input path
-        zf = zipfile.ZipFile(file=output_path, mode='w', compression=zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(file=output_path, mode='w', compression=zipfile.ZIP_DEFLATED, compresslevel=9)
 
         for root, folders, files in os.walk(input_path):
             for file in sorted(files):
@@ -57,7 +60,7 @@ def zip_dir(input_path, output_folder, output_file):
 # In[ ]:
 
 
-print(ox.ts(), f'begin compressing and staging files using {cpus} CPUs')
+print(ox.ts(), f'begin compressing and staging files')
 
 params = []
 for item in manifest:

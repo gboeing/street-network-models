@@ -6,6 +6,7 @@
 
 import datetime
 import json
+import multiprocessing as mp
 import os
 import osmnx as ox
 import pandas as pd
@@ -22,6 +23,11 @@ with open('../config.json') as f:
 
 ox.config(log_file=True, logs_folder=config['osmnx_log_path'])
 
+if config['cpus'] == 0:
+    cpus = mp.cpu_count()
+else:
+    cpus = config['cpus']
+print(ox.ts(), 'using', cpus, 'CPUs')
 
 # In[ ]:
 
@@ -43,13 +49,29 @@ if not os.path.exists(nodes_folder):
 country_folders = os.listdir(graphml_folder)
 print('extracting nodes from UC graphs of {} countries'.format(len(country_folders)))
 
+
+def get_graph_nodes(graphml_folder, country_folder, filename):
+    filepath = os.path.join(graphml_folder, country_folder, filename)
+    G = ox.load_graphml(filepath)
+    graph_nodes = ox.graph_to_gdfs(G, edges=False, node_geometry=False)[['x', 'y']]
+    return graph_nodes
+
+
 for i, country_folder in enumerate(sorted(country_folders)):
 
-    country_nodes = pd.DataFrame()
-    for filename in os.listdir(os.path.join(graphml_folder, country_folder)):
+    params = ((graphml_folder, country_folder, filename) for filename in os.listdir(os.path.join(graphml_folder, country_folder)))
 
-        G = ox.load_graphml(filepath=os.path.join(graphml_folder, country_folder, filename))
-        graph_nodes = ox.graph_to_gdfs(G, edges=False, node_geometry=False)[['x', 'y']]
+    # create a pool of worker processes then map function/parameters to them
+    pool = mp.Pool(cpus)
+    sma = pool.starmap_async(get_graph_nodes, list(params))
+
+    # get the results, close the pool, wait for worker processes to all exit
+    results = sma.get()
+    pool.close()
+    pool.join()
+
+    country_nodes = pd.DataFrame()
+    for graph_nodes in results:
         country_nodes = country_nodes.append(graph_nodes, ignore_index=False, verify_integrity=False)
 
     # remove any duplicates
@@ -72,10 +94,4 @@ count = 0
 for file in os.listdir(nodes_folder):
     count += len(pd.read_csv(os.path.join(nodes_folder, file)))
 print('total node count across all countries:', count)
-
-
-# In[ ]:
-
-
-
 

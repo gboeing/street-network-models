@@ -5,10 +5,12 @@
 
 
 import json
+import multiprocessing as mp
 import networkx as nx
 import os
 import osmnx as ox
 import pandas as pd
+import random
 
 print('osmnx version', ox.__version__)
 
@@ -21,6 +23,12 @@ with open('../config.json') as f:
 
 ox.config(log_file=True,
           logs_folder=config['osmnx_log_path'])
+
+if config['cpus'] == 0:
+    cpus = mp.cpu_count()
+else:
+    cpus = config['cpus']
+print(ox.ts(), 'using', cpus, 'CPUs')
 
 graphml_folder = config['models_graphml_path'] #where to load/save graphml
 gpkg_folder = config['models_gpkg_path']       #where to save graph geopackages
@@ -69,8 +77,8 @@ def add_elevations(country_folder, graph_filename):
 
     # set nodes' elevation attributes
     nx.set_node_attributes(G, name='elevation', values=graph_elevs['elevation'])
-    #nx.set_node_attributes(G, name='elevation_aster', values=graph_elevs['elev_aster'].dropna().astype(int))
-    #nx.set_node_attributes(G, name='elevation_srtm', values=graph_elevs['elev_srtm'].dropna().astype(int))
+    nx.set_node_attributes(G, name='elevation_aster', values=graph_elevs['elev_aster'].dropna().astype(int))
+    nx.set_node_attributes(G, name='elevation_srtm', values=graph_elevs['elev_srtm'].dropna().astype(int))
 
     # confirm that no graph node is missing elevation
     assert set(G.nodes) == set(nx.get_node_attributes(G, 'elevation'))
@@ -97,18 +105,25 @@ def add_elevations(country_folder, graph_filename):
 
 # In[ ]:
 
-
+params = []
 country_folders = sorted(os.listdir(graphml_folder))
 for country_folder in country_folders:
     country_graphml_path = os.path.join(graphml_folder, country_folder)
     graphml_filenames = sorted(os.listdir(country_graphml_path))
-    print(ox.ts(), 'process', len(graphml_filenames), 'graphs for', country_folder)
     for graphml_filename in graphml_filenames:
-        add_elevations(country_folder, graphml_filename)
+        params.append((country_folder, graphml_filename))
 
+# randomly order params so one thread doesn't have to do all the big graphs
+random.shuffle(params)
+print(ox.ts(), 'add node elevations to', len(params), 'graphs files')
 
-# In[ ]:
+# create a pool of worker processes then map function/parameters to them
+pool = mp.Pool(cpus)
+sma = pool.starmap_async(add_elevations, params)
 
+# get the results, close the pool, wait for worker processes to all exit
+results = sma.get()
+pool.close()
+pool.join()
 
-
-
+print(ox.ts(), 'process finished')

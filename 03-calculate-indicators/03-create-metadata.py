@@ -29,16 +29,22 @@ edges_metadata_path = config['models_metadata_edges_path'] #output graph edges m
 
 # graph nodes metadata
 desc = OrderedDict()
-desc['osmid']         = {'description' : 'Unique OSM node ID',
-                         'type'        : 'int'}
-desc['x']             = {'description' : 'Longitude coordinate (epsg 4326)',
-                         'type'        : 'float'}
-desc['y']             = {'description' : 'Latitude coordinate (epsg 4326)',
-                         'type'        : 'float'}
-desc['elevation']     = {'description' : 'Node elevation (meters above sea level) from ASTER or SRTM',
-                         'type'        : 'float'}
-desc['other attributes'] = {'description' : 'As defined in OSM documentation',
-                            'type'        : ''}
+desc['osmid']           = {'description' : 'Unique OSM node ID',
+                           'type'        : 'int'}
+desc['x']               = {'description' : 'Longitude coordinate (epsg:4326)',
+                           'type'        : 'float'}
+desc['y']               = {'description' : 'Latitude coordinate (epsg:4326)',
+                           'type'        : 'float'}
+desc['elevation']       = {'description' : 'Node elevation (meters above sea level) from ASTER or SRTM',
+                           'type'        : 'int'}
+desc['elevation_aster'] = {'description' : 'Node elevation (meters above sea level) from ASTER',
+                           'type'        : 'int'}
+desc['elevation_srtm']  = {'description' : 'Node elevation (meters above sea level) from SRTM',
+                           'type'        : 'int'}
+desc['street_count']    = {'description' : 'Number of physical streets segments connected to this node',
+                           'type'        : 'int'}
+desc['other attributes']= {'description' : 'As defined in OSM documentation',
+                           'type'        : ''}
 
 # save metadata to disk
 nodes_metadata = pd.DataFrame(desc).T.reset_index().rename(columns={'index':'indicator'})
@@ -57,11 +63,11 @@ desc['v']        = {'description' : 'Unique OSM ID of destination node',
                     'type'        : 'int'}
 desc['key']      = {'description' : 'Unique ID if parallel edges exist between u and v',
                     'type'        : 'int'}
-desc['osmid']    = {'description' : 'Unique OSM node ID',
+desc['osmid']    = {'description' : 'Unique OSM way ID',
                     'type'        : 'int'}
-desc['geometry'] = {'description' : 'Edge centerline geometry (epsg 4326)',
+desc['geometry'] = {'description' : 'Edge centerline geometry (epsg:4326)',
                     'type'        : 'linestring'}
-desc['oneway']   = {'description' : 'If edge is part of a one-way street',
+desc['oneway']   = {'description' : 'Is edge part of a one-way street',
                     'type'        : 'boolean'}
 desc['length']   = {'description' : 'Length along the edge (meters)',
                     'type'        : 'float'}
@@ -87,6 +93,10 @@ desc['country'] = 'Main country name'
 desc['country_iso'] = 'Main country ISO 3166-1 alpha-3 code'
 desc['core_city'] = 'Urban center core city name'
 desc['uc_id'] = 'Urban center unique ID'
+desc['cc_avg_dir'] = 'Average clustering coefficient (directed)'
+desc['cc_avg_undir'] = 'Average clustering coefficient (undirected)'
+desc['cc_wt_avg_dir'] = 'Average clustering coefficient (weighted/directed)'
+desc['cc_wt_avg_undir'] = 'Average clustering coefficient (weighted/undirected)'
 desc['circuity'] = 'Ratio of street lengths to straightline distances'
 desc['elev_iqr'] = 'Interquartile range of node elevations, meters'
 desc['elev_mean'] = 'Mean node elevation, meters'
@@ -106,9 +116,11 @@ desc['street_segment_count'] = 'Count of streets (undirected edges)'
 desc['node_count'] = 'Count of nodes'
 desc['orientation_entropy'] = 'Entropy of street network bearings'
 desc['orientation_order'] = 'Orientation order of street network bearings'
+desc['pagerank_max'] = 'The maximum PageRank value of any node'
 desc['prop_4way'] = 'Proportion of nodes that represent 4-way street intersections'
 desc['prop_3way'] = 'Proportion of nodes that represent 3-way street intersections'
 desc['prop_deadend'] = 'Proportion of nodes that represent dead-ends'
+desc['self_loop_proportion'] = 'Proportion of edges that are self-loops'
 desc['straightness'] = '1 / circuity'
 desc['uc_names'] = 'List of city names within this urban center (GISCO)'
 desc['world_region'] = 'Major geographical region (UN WUP)'

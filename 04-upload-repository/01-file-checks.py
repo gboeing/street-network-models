@@ -3,6 +3,7 @@
 
 import json
 import os
+import pandas as pd
 
 
 
@@ -49,18 +50,18 @@ for country in os.listdir(nelist_folder):
 
 
 # check that we have the same number of country folders for each file type
-print(len(os.listdir(nelist_folder)), len(os.listdir(gpkg_folder)), len(os.listdir(graphml_folder)))
+lens = len(os.listdir(nelist_folder)), len(os.listdir(gpkg_folder)), len(os.listdir(graphml_folder))
 country_check = len(os.listdir(nelist_folder)) == len(os.listdir(gpkg_folder)) == len(os.listdir(graphml_folder))
-print('same number of country folders for each file type:', country_check)
+print('same number of country folders for each file type:', lens, country_check)
 
 
 
 
 
 # check that we have the same number of gpkg, graphml, and node/edge list files
-print(len(gpkgs), len(graphmls), int(len(nelists) / 2))
+lens = len(gpkgs), len(graphmls), int(len(nelists) / 2)
 file_check = len(gpkgs) == len(graphmls) == int(len(nelists) / 2)
-print('same number of files of each type:', file_check)
+print('same number of files of each type:', lens, file_check)
 
 
 
@@ -76,8 +77,18 @@ print('same set of names across all file types:', names_check)
 
 
 
+# check that an indicator row exists for every graphml file
+inds = pd.read_csv(config['indicators_path'])
+ucids1 = set(inds['uc_id'].values)
+ucids2 = set(int(g.split('-')[-1].split('.')[0]) for g in graphmls)
+indicator_check = ucids1 == ucids2
+print('indicator rows exist for every graphml file:', indicator_check)
+
+
+
+
 # throw exception if any checks failed
-if (country_check and file_check and names_check):
+if (country_check and file_check and names_check and indicator_check):
     print('ALL CHECKS OK')
 else:
     print('WARNING: SOME CHECKS FAILED')
