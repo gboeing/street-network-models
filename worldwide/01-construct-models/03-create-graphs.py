@@ -60,11 +60,6 @@ uc_gpkg_path = config['uc_gpkg_path'] #prepped urban centers dataset
 output_graphml_path = config['models_graphml_path'] #where to save graphml files
 
 
-# save environment file
-os.system('conda env export > ../environment.yml')
-print(ox.ts(), 'exported conda env to ../environment.yml')
-
-
 # ## Load the prepped urban centers data
 
 # In[ ]:

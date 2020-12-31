@@ -55,11 +55,6 @@ truncate_by_edge = True
 uc_gpkg_path = config['uc_gpkg_path'] #prepped urban centers dataset
 
 
-# save environment file
-os.system('conda env export > ../environment.yml')
-print(ox.ts(), 'exported conda env to ../environment.yml')
-
-
 # ## Load the prepped urban centers data
 
 # In[ ]:

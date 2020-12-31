@@ -1,6 +1,6 @@
 #!/bin/bash
 eval "$(conda shell.bash hook)"
-conda activate ox
+conda activate snm
 cd ./01-construct-models
 python ./01-prep-data.py
 python ./02-download-cache.py

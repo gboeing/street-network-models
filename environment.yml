@@ -1,0 +1,14 @@
+name: snm
+channels:
+  - conda-forge
+dependencies:
+  - geopandas=0.8.*
+  - networkx=2.5.*
+  - numpy=1.19.*
+  - osmnx  # =1.0.*
+  - pandas=1.2.*
+  - python=3.9.*
+  - requests=2.25.*
+  - scikit-learn=0.24.*
+  - scipy=1.5.*
+  - xmltodict=0.12.*

@@ -40,7 +40,7 @@ host = 'https://dataverse.harvard.edu'
 attempts_max = 3      #how many times to re-try same file upload after error before giving up
 pause_error = 10      #seconds to pause after an error
 pause_normal = 0      #seconds to pause between uploads
-upload_timeout = 1000 #how long to set the timeout for upload via http post
+upload_timeout = 1200 #how long to set the timeout for upload via http post
 
 
 # In[ ]:

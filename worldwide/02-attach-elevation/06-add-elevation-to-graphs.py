@@ -47,14 +47,15 @@ def save_node_edge_lists(G, nelist_folder):
 
     # save node and edge lists as csv
     nodes, edges = ox.graph_to_gdfs(G, node_geometry=False, fill_edge_geometry=False)
-    edges['length'] = edges['length'].round(2).astype(str)
 
+    edges[['grade', 'grade_abs', 'length']] = edges[['grade', 'grade_abs', 'length']].round(3)
     ecols = ['u', 'v', 'key', 'oneway', 'highway', 'name', 'length', 'grade', 'grade_abs',
              'lanes', 'width', 'est_width', 'maxspeed', 'access', 'service',
              'bridge', 'tunnel', 'area', 'junction', 'osmid', 'ref']
+    edges = edges.drop(columns=['geometry']).reset_index().reindex(columns=ecols)
 
-    edges = edges.drop(columns=['geometry']).reindex(columns=ecols)
-    nodes = nodes.reindex(columns=['osmid', 'x', 'y', 'elevation', 'elevation_res', 'ref', 'highway'])
+    ncols = ['osmid', 'x', 'y', 'elevation', 'elevation_aster', 'elevation_srtm', 'ref', 'highway']
+    nodes = nodes.reset_index().reindex(columns=ncols)
 
     if not os.path.exists(nelist_folder):
         os.makedirs(nelist_folder)
@@ -76,7 +77,7 @@ def add_elevations(country_folder, graph_filename):
     graph_elevs = df_elevs.loc[set(G.nodes)].sort_index()
 
     # set nodes' elevation attributes
-    nx.set_node_attributes(G, name='elevation', values=graph_elevs['elevation'])
+    nx.set_node_attributes(G, name='elevation', values=graph_elevs['elevation'].astype(int))
     nx.set_node_attributes(G, name='elevation_aster', values=graph_elevs['elev_aster'].dropna().astype(int))
     nx.set_node_attributes(G, name='elevation_srtm', values=graph_elevs['elev_srtm'].dropna().astype(int))
 
