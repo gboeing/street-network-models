@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 eval "$(conda shell.bash hook)"
 conda activate snm
 cd ./01-construct-models
@@ -27,3 +28,5 @@ python 03-create-metadata.py
 cd ../04-upload-repository
 python 01-file-checks.py
 python 02-stage-files.py
+python 03-upload-dataverse.py
+cd ..
