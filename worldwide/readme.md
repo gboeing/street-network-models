@@ -87,14 +87,7 @@ Get each URL one at a time. Save node ID + elevation to disk for all nodes.
 
 #### 2.5. Process elevations
 
-Loads ASTER, SRTM, and Google elevation data then selects one of ASTER or SRTM to use as the node elevation value, for each node.
-
-Elevation selection rules:
-  1. By default use ASTER as elevation value
-  2. Fill ASTER nulls with SRTM values
-  3. If ASTER and SRTM differ by more than SRTM spec's error (16 meters [see article](https://www.sciencedirect.com/science/article/abs/pii/S0034425706002008)), use whichever is closer to the Google (validation) value, as tie-breaker.
-
-Finally, save to a CSV file of node elevations.
+Loads ASTER, SRTM, and Google elevation data then selects one of ASTER or SRTM to use as the node elevation value, for each node. Finally, save to a CSV file of node elevations.
 
 #### 2.6. Add elevation to nodes
 
