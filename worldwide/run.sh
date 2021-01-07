@@ -5,7 +5,6 @@ conda activate snm
 cd ./01-construct-models
 python ./01-prep-data.py
 python ./02-download-cache.py
-python ./02-download-cache.py
 python ./03-create-graphs.py
 cd ../02-attach-elevation
 python ./01-elevation-extract-nodes.py
