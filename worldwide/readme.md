@@ -1,6 +1,11 @@
-# Street Network Models and Indicators 
+# Street Network Models and Indicators
 
-This project models and analyzes the street networks of every urban area in the world. It produces open data repositories of the street network models and the indicators: https://dataverse.harvard.edu/dataverse/global-urban-street-networks
+This project models and analyzes the street networks of every urban area in the world.
+
+It produces open data repositories of the street network models and the indicators: https://dataverse.harvard.edu/dataverse/global-urban-street-networks
+
+**Citation information:** Boeing, G. 2021. Street Network Models and Indicators for Every Urban Area in the World. Working paper available at https://doi.org/10.31235/osf.io/f2dqc
+
 
 
 ## Input data
@@ -11,9 +16,17 @@ Create a project data root folder with a `inputs` subfolder and place the follow
 
 Urban boundaries dataset citation: Florczyk, A.J., Corbane, C., Schiavina, M., Pesaresi, M., Maffenini, L., Melchiorri, M., Politis, P., Sabo, F., Freire, S., Ehrlich, D., Kemper, T., Tommasi, P., Airaghi, D. and L. Zanchetta. 2019. GHS Urban Centre Database 2015, multitemporal and multidimensional attributes, R2019A. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/53473144-b88c-44bc-b4a3-4583ed1f547e
 
+
+
 ## Workflow
 
-The workflow is organized into folders and scripts.
+System requirements:
+
+  - Required: 32 gb of memory for single-processor execution (note: you'll have to edit the config file to set the CPU counts to 1).
+  - Recommended: 128 gb of memory + 24 CPU cores for multi-processor execution as parameterized in the config file.
+  - Create a new [conda](https://conda.io) environment from `environment.yml` to install all the necessary packages to run the workflow.
+
+The workflow is organized into folders and scripts, as follows.
 
 ### 1. Construct models
 
