@@ -1,48 +1,45 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # In[ ]:
 
 
 import json
 import multiprocessing as mp
-import networkx as nx
-import numpy as np
 import os
-import osmnx as ox
-import pandas as pd
 import random
 import time
+
+import networkx as nx
+import numpy as np
+import osmnx as ox
+import pandas as pd
 from scipy import stats
 
-print('osmnx version', ox.__version__)
-print('networkx version', nx.__version__)
+print("osmnx version", ox.__version__)
+print("networkx version", nx.__version__)
 
 
 # In[ ]:
 
 
 # load configs
-with open('../config.json') as f:
+with open("../config.json") as f:
     config = json.load(f)
 
-ox.config(log_file=True,
-          logs_folder=config['osmnx_log_path'])
+ox.config(log_file=True, logs_folder=config["osmnx_log_path"])
 
-if config['cpus_stats'] == 0:
+if config["cpus_stats"] == 0:
     cpus = mp.cpu_count()
 else:
-    cpus = config['cpus_stats']
-print(ox.ts(), 'using', cpus, 'CPUs')
+    cpus = config["cpus_stats"]
+print(ox.ts(), "using", cpus, "CPUs")
 
-graphml_folder = config['models_graphml_path'] #where to load graphml files
-indicators_street_path = config['indicators_street_path'] #where to save output street network indicators
-save_every_n = 100 #save results every n cities
+graphml_folder = config["models_graphml_path"]  # where to load graphml files
+indicators_street_path = config["indicators_street_path"]  # where to save output street network indicators
+save_every_n = 100  # save results every n cities
 
-clean_int_tol = 10 #meters for intersection cleaning tolerance
+clean_int_tol = 10  # meters for intersection cleaning tolerance
 
 entropy_bins = 36
-min_entropy_bins = 4 #perfect grid
+min_entropy_bins = 4  # perfect grid
 perfect_grid = [1] * min_entropy_bins + [0] * (entropy_bins - min_entropy_bins)
 perfect_grid_entropy = stats.entropy(perfect_grid)
 
@@ -58,8 +55,8 @@ def reverse_bearing(x):
 def get_unweighted_bearings(Gu, threshold):
     # calculate edge bearings
     # threshold lets you discard streets < some length from the bearings analysis
-    b = pd.Series([d['bearing'] for u, v, k, d in Gu.edges(keys=True, data=True) if d['length'] > threshold])
-    return pd.concat([b, b.map(reverse_bearing)]).reset_index(drop='True')
+    b = pd.Series([d["bearing"] for u, v, k, d in Gu.edges(keys=True, data=True) if d["length"] > threshold])
+    return pd.concat([b, b.map(reverse_bearing)]).reset_index(drop="True")
 
 
 def count_and_merge(n, bearings):
@@ -88,7 +85,9 @@ def calculate_orientation_entropy(Gu, threshold=10, entropy_bins=entropy_bins):
     return entropy
 
 
-def calculate_orientation_order(orientation_entropy, entropy_bins=entropy_bins, perfect_grid_entropy=perfect_grid_entropy):
+def calculate_orientation_order(
+    orientation_entropy, entropy_bins=entropy_bins, perfect_grid_entropy=perfect_grid_entropy
+):
     max_entropy = np.log(entropy_bins)
     orientation_order = 1 - ((orientation_entropy - perfect_grid_entropy) / (max_entropy - perfect_grid_entropy)) ** 2
     return orientation_order
@@ -98,40 +97,37 @@ def calculate_orientation_order(orientation_entropy, entropy_bins=entropy_bins, 
 
 
 def calculate_circuity(Gu, length_total):
+    coords = np.array(
+        [[Gu.nodes[u]["y"], Gu.nodes[u]["x"], Gu.nodes[v]["y"], Gu.nodes[v]["x"]] for u, v, k in Gu.edges(keys=True)]
+    )
+    df_coords = pd.DataFrame(coords, columns=["u_y", "u_x", "v_y", "v_x"])
 
-    coords = np.array([[Gu.nodes[u]['y'], Gu.nodes[u]['x'], Gu.nodes[v]['y'], Gu.nodes[v]['x']] for u, v, k in Gu.edges(keys=True)])
-    df_coords = pd.DataFrame(coords, columns=['u_y', 'u_x', 'v_y', 'v_x'])
-
-    distances = ox.distance.great_circle_vec(lat1=df_coords['u_y'],
-                                             lng1=df_coords['u_x'],
-                                             lat2=df_coords['v_y'],
-                                             lng2=df_coords['v_x'])
+    distances = ox.distance.great_circle_vec(
+        lat1=df_coords["u_y"], lng1=df_coords["u_x"], lat2=df_coords["v_y"], lng2=df_coords["v_x"]
+    )
 
     circuity_avg = length_total / distances.fillna(value=0).sum()
     return circuity_avg
 
 
 def intersection_counts(Gup, spn, tolerance=clean_int_tol):
-
     node_ids = set(Gup.nodes)
     intersect_count = len([1 for node, count in spn.items() if (count > 1) and (node in node_ids)])
 
-    intersect_count_clean = len(ox.consolidate_intersections(Gup,
-                                                             tolerance=tolerance,
-                                                             rebuild_graph=False,
-                                                             dead_ends=False))
+    intersect_count_clean = len(
+        ox.consolidate_intersections(Gup, tolerance=tolerance, rebuild_graph=False, dead_ends=False)
+    )
 
-    intersect_count_clean_topo = len(ox.consolidate_intersections(Gup,
-                                                                  tolerance=tolerance,
-                                                                  rebuild_graph=True,
-                                                                  reconnect_edges=False,
-                                                                  dead_ends=False))
+    intersect_count_clean_topo = len(
+        ox.consolidate_intersections(
+            Gup, tolerance=tolerance, rebuild_graph=True, reconnect_edges=False, dead_ends=False
+        )
+    )
 
     return intersect_count, intersect_count_clean, intersect_count_clean_topo
 
 
 def get_clustering(G):
-
     # get directed graph without parallel edges
     D = ox.get_digraph(G, weight="length")
 
@@ -158,26 +154,32 @@ def get_clustering(G):
 
 # calculate elevation & grade stats
 def elevation_grades(Gu):
-
-    grades = pd.Series(nx.get_edge_attributes(Gu, 'grade_abs'))
-    elevs = pd.Series(nx.get_node_attributes(Gu, 'elevation'))
+    grades = pd.Series(nx.get_edge_attributes(Gu, "grade_abs"))
+    elevs = pd.Series(nx.get_node_attributes(Gu, "elevation"))
     elev_iqr = elevs.quantile(0.75) - elevs.quantile(0.25)
     elev_range = elevs.max() - elevs.min()
 
-    return grades.mean(), grades.median(), elevs.mean(), elevs.median(), elevs.std(), elev_range, elev_iqr
+    return (
+        grades.mean(),
+        grades.median(),
+        elevs.mean(),
+        elevs.median(),
+        elevs.std(),
+        elev_range,
+        elev_iqr,
+    )
 
 
 # In[ ]:
 
 
 def save_results(indicators, output_path):
-
-    output_folder = output_path[:output_path.rfind('/')]
+    output_folder = output_path[: output_path.rfind("/")]
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     df = pd.DataFrame(indicators).T.reset_index(drop=True)
-    df.to_csv(output_path, index=False, encoding='utf-8')
+    df.to_csv(output_path, index=False, encoding="utf-8")
     print(ox.ts(), f'saved {len(indicators)} results to disk at "{output_path}"')
     return df
 
@@ -186,15 +188,14 @@ def save_results(indicators, output_path):
 
 
 def calculate_graph_indicators(graphml_folder, country_folder, filename):
-
     # get filepath and country/city identifiers
     filepath = os.path.join(graphml_folder, country_folder, filename)
-    country, country_iso = country_folder.split('-')
-    core_city, uc_id = filename.replace('.graphml', '').split('-')
+    country, country_iso = country_folder.split("-")
+    core_city, uc_id = filename.replace(".graphml", "").split("-")
     uc_id = int(uc_id)
 
     start_time = time.time()
-    print(ox.ts(), 'processing', filepath)
+    print(ox.ts(), "processing", filepath)
     G = ox.load_graphml(filepath=filepath)
 
     # clustering and pagerank: needs directed representation
@@ -206,7 +207,7 @@ def calculate_graph_indicators(graphml_folder, country_folder, filename):
     G = None
 
     # street lengths
-    lengths = pd.Series(nx.get_edge_attributes(Gu, 'length'))
+    lengths = pd.Series(nx.get_edge_attributes(Gu, "length"))
     length_total = lengths.sum()
     length_median = lengths.median()
     length_mean = lengths.mean()
@@ -218,7 +219,7 @@ def calculate_graph_indicators(graphml_folder, country_folder, filename):
     self_loop_proportion = sum(u == v for u, v, k in Gu.edges) / m
 
     # proportion of 4-way intersections, 3-ways, and dead-ends
-    streets_per_node = nx.get_node_attributes(Gu, 'street_count')
+    streets_per_node = nx.get_node_attributes(Gu, "street_count")
     prop_4way = list(streets_per_node.values()).count(4) / n
     prop_3way = list(streets_per_node.values()).count(3) / n
     prop_deadend = list(streets_per_node.values()).count(1) / n
@@ -235,65 +236,66 @@ def calculate_graph_indicators(graphml_folder, country_folder, filename):
     orientation_order = calculate_orientation_order(orientation_entropy)
 
     # total and clean intersection counts
-    intersect_count, intersect_count_clean, intersect_count_clean_topo = intersection_counts(ox.project_graph(Gu), streets_per_node)
+    intersect_count, intersect_count_clean, intersect_count_clean_topo = intersection_counts(
+        ox.project_graph(Gu), streets_per_node
+    )
 
     # assemble the results
-    rslt = {'country'                    : country,
-            'country_iso'                : country_iso,
-            'core_city'                  : core_city,
-            'uc_id'                      : uc_id,
-            'cc_avg_dir'                 : cc_avg_dir,
-            'cc_avg_undir'               : cc_avg_undir,
-            'cc_wt_avg_dir'              : cc_wt_avg_dir,
-            'cc_wt_avg_undir'            : cc_wt_avg_undir,
-            'circuity'                   : circuity,
-            'elev_iqr'                   : elev_iqr,
-            'elev_mean'                  : elev_mean,
-            'elev_median'                : elev_median,
-            'elev_range'                 : elev_range,
-            'elev_std'                   : elev_std,
-            'grade_mean'                 : grade_mean,
-            'grade_median'               : grade_median,
-            'intersect_count'            : intersect_count,
-            'intersect_count_clean'      : intersect_count_clean,
-            'intersect_count_clean_topo' : intersect_count_clean_topo,
-            'k_avg'                      : k_avg,
-            'length_mean'                : length_mean,
-            'length_median'              : length_median,
-            'length_total'               : length_total,
-            'street_segment_count'       : m,
-            'node_count'                 : n,
-            'orientation_entropy'        : orientation_entropy,
-            'orientation_order'          : orientation_order,
-            'pagerank_max'               : pagerank_max,
-            'prop_4way'                  : prop_4way,
-            'prop_3way'                  : prop_3way,
-            'prop_deadend'               : prop_deadend,
-            'self_loop_proportion'       : self_loop_proportion,
-            'straightness'               : straightness}
+    rslt = {
+        "country": country,
+        "country_iso": country_iso,
+        "core_city": core_city,
+        "uc_id": uc_id,
+        "cc_avg_dir": cc_avg_dir,
+        "cc_avg_undir": cc_avg_undir,
+        "cc_wt_avg_dir": cc_wt_avg_dir,
+        "cc_wt_avg_undir": cc_wt_avg_undir,
+        "circuity": circuity,
+        "elev_iqr": elev_iqr,
+        "elev_mean": elev_mean,
+        "elev_median": elev_median,
+        "elev_range": elev_range,
+        "elev_std": elev_std,
+        "grade_mean": grade_mean,
+        "grade_median": grade_median,
+        "intersect_count": intersect_count,
+        "intersect_count_clean": intersect_count_clean,
+        "intersect_count_clean_topo": intersect_count_clean_topo,
+        "k_avg": k_avg,
+        "length_mean": length_mean,
+        "length_median": length_median,
+        "length_total": length_total,
+        "street_segment_count": m,
+        "node_count": n,
+        "orientation_entropy": orientation_entropy,
+        "orientation_order": orientation_order,
+        "pagerank_max": pagerank_max,
+        "prop_4way": prop_4way,
+        "prop_3way": prop_3way,
+        "prop_deadend": prop_deadend,
+        "self_loop_proportion": self_loop_proportion,
+        "straightness": straightness,
+    }
 
     elapsed = time.time() - start_time
-    ox.log(f'finished {filepath} in {elapsed:.0f} seconds')
+    ox.log(f"finished {filepath} in {elapsed:.0f} seconds")
     return rslt
-
-
 
 
 # In[ ]:
 indicators = dict()
 if cpus == 1:
-
     if os.path.exists(indicators_street_path):
-        indicators = pd.read_csv(indicators_street_path).set_index('uc_id', drop=False).T.to_dict()
+        indicators = pd.read_csv(indicators_street_path).set_index("uc_id", drop=False).T.to_dict()
 
     counter = 0
     for country_folder in sorted(os.listdir(graphml_folder)):
         for filename in sorted(os.listdir(os.path.join(graphml_folder, country_folder))):
-            _, uc_id = filename.replace('.graphml', '').split('-')
+            _, uc_id = filename.replace(".graphml", "").split("-")
             uc_id = int(uc_id)
             if uc_id in indicators:
                 # already have indicator results for this one, so skip it
-                print(ox.ts(), 'already got', country_folder, filename)
+                print(ox.ts(), "already got", country_folder, filename)
             else:
                 # calculate indicators for this graph
                 indicators[uc_id] = calculate_graph_indicators(graphml_folder, country_folder, filename)
@@ -303,7 +305,6 @@ if cpus == 1:
                 if counter % save_every_n == 0:
                     df = save_results(indicators, indicators_street_path)
 else:
-
     params = list()
     for country_folder in sorted(os.listdir(graphml_folder)):
         for filename in sorted(os.listdir(os.path.join(graphml_folder, country_folder))):
@@ -311,7 +312,7 @@ else:
 
     # randomly order params so one thread doesn't have to do all the big graphs
     random.shuffle(params)
-    print(ox.ts(), 'processing', len(params), 'graphs')
+    print(ox.ts(), "processing", len(params), "graphs")
 
     # create a pool of worker processes then map function/parameters to them
     pool = mp.Pool(cpus)
@@ -323,7 +324,7 @@ else:
     pool.join()
 
     for result in results:
-        indicators[result['uc_id']] = result
+        indicators[result["uc_id"]] = result
 
 
 # In[ ]:
@@ -334,7 +335,3 @@ df = save_results(indicators, indicators_street_path)
 
 
 # In[ ]:
-
-
-
-

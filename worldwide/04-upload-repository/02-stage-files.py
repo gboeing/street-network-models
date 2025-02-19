@@ -1,52 +1,49 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # In[ ]:
 
 
 import json
 import multiprocessing as mp
 import os
-import osmnx as ox
 import zipfile
 
+import osmnx as ox
 
 # In[ ]:
 
 
 # load configs
-with open('../config.json') as f:
+with open("../config.json") as f:
     config = json.load(f)
 
 # map input folders to output folders containing zipped country files
-manifest = [{'input': config['models_gpkg_path'],    'output': config['staging_gpkg_path']},
-            {'input': config['models_graphml_path'], 'output': config['staging_graphml_path']},
-            {'input': config['models_nelist_path'],  'output': config['staging_nelist_path']}]
+manifest = [
+    {"input": config["models_gpkg_path"], "output": config["staging_gpkg_path"]},
+    {"input": config["models_graphml_path"], "output": config["staging_graphml_path"]},
+    {"input": config["models_nelist_path"], "output": config["staging_nelist_path"]},
+]
 
-if config['cpus'] == 0:
+if config["cpus"] == 0:
     cpus = mp.cpu_count()
 else:
-    cpus = config['cpus']
-print(ox.ts(), 'using', cpus, 'CPUs')
+    cpus = config["cpus"]
+print(ox.ts(), "using", cpus, "CPUs")
 
 # In[ ]:
 
 
 # zip a whole directory
 def zip_dir(input_path, output_folder, output_file):
-
     output_path = os.path.join(output_folder, output_file)
     if not os.path.exists(output_path):
         print(ox.ts(), input_path, output_path)
 
         # create a zip file to contain all the files from the input path
-        zf = zipfile.ZipFile(file=output_path, mode='w', compression=zipfile.ZIP_DEFLATED, compresslevel=9)
+        zf = zipfile.ZipFile(file=output_path, mode="w", compression=zipfile.ZIP_DEFLATED, compresslevel=9)
 
-        for root, folders, files in os.walk(input_path):
+        for root, _, files in os.walk(input_path):
             for file in sorted(files):
-
                 input_file = os.path.join(root, file)
-                if '/nelist/' in input_file:
+                if "/nelist/" in input_file:
                     # preserve the relative folder structure below country level in zip file
                     arcname = os.path.join(os.path.split(root)[-1], file)
                 else:
@@ -60,18 +57,17 @@ def zip_dir(input_path, output_folder, output_file):
 # In[ ]:
 
 
-print(ox.ts(), f'begin compressing and staging files')
+print(ox.ts(), "begin compressing and staging files")
 
 params = []
 for item in manifest:
-
-    output_folder = item['output']
+    output_folder = item["output"]
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    for country_folder in sorted(os.listdir(item['input'])):
-        input_path = os.path.join(item['input'], country_folder)
-        output_file = country_folder + '.zip'
+    for country_folder in sorted(os.listdir(item["input"])):
+        input_path = os.path.join(item["input"], country_folder)
+        output_file = country_folder + ".zip"
         params.append((input_path, output_folder, output_file))
 
 # create a pool of worker processes
@@ -85,11 +81,7 @@ sma.get()
 pool.close()
 pool.join()
 
-print(ox.ts(), 'finished compressing and staging files')
+print(ox.ts(), "finished compressing and staging files")
 
 
 # In[ ]:
-
-
-
-

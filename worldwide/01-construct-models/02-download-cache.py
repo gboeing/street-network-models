@@ -1,127 +1,69 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-import datetime
-import geopandas as gpd
 import json
 import logging as lg
-import networkx as nx
-import os
-import osmnx as ox
-import pandas as pd
+import multiprocessing as mp
 import time
 
-print('osmnx version', ox.__version__)
-print('networkx version', nx.__version__)
+import geopandas as gpd
+import osmnx as ox
 
+print(ox.ts(), "OSMnx version", ox.__version__)
 
-# ## Config
-
-# In[ ]:
-
+# hardcode CPU count to parallelize it without hammering Overpass server
+cpus = 3
 
 # load configs
-with open('../config.json') as f:
+with open("./config.json") as f:
     config = json.load(f)
 
-
-# In[ ]:
-
-
-ox.config(use_cache=True,
-          log_file=True,
-          log_console=False,
-          logs_folder=config['osmnx_log_path'],
-          cache_folder=config['osmnx_cache_path'])
-
-# just cache the OSM data then interrupt before building graph model
+# configure OSMnx
+ox.settings.log_file = True
+ox.settings.log_console = False
+ox.settings.logs_folder = config["osmnx_log_path"]
+ox.settings.cache_folder = config["osmnx_cache_path"]
+ox.settings.use_cache = True
 ox.settings.cache_only_mode = True
 
-
-# In[ ]:
-
-
-network_type = 'drive'
+# configure queries
+network_type = "drive"
 retain_all = True
 simplify = True
 truncate_by_edge = True
 
-
-# In[ ]:
-
-
-uc_gpkg_path = config['uc_gpkg_path'] #prepped urban centers dataset
-
-
-# ## Load the prepped urban centers data
-
-# In[ ]:
+# load the prepped urban centers dataset
+uc_gpkg_path = config["uc_gpkg_path"]
+ucs = gpd.read_file(uc_gpkg_path).sort_values("GH_BUS_TOT_2025", ascending=True)
+msg = f"Loaded urban centers data with shape {ucs.shape} from {uc_gpkg_path!r}"
+print(ox.ts(), msg)
 
 
-# load the prepped dataset
-ucs = gpd.read_file(uc_gpkg_path).sort_values('B15', ascending=False)
-print(ox.ts(), 'loaded urban centers dataset with shape', ucs.shape)
-
-
-# In[ ]:
-
-
-# only retain urban centers marked as a "true positive" in quality control
-ucs = ucs[ucs['QA2_1V'] == 1]
-print(ox.ts(), 'retained "true positive" urban centers dataset with shape', ucs.shape)
-
-
-# In[ ]:
-
-
-# only retain urban centers with at least 1 sq km of built-up area
-ucs = ucs[ucs['B15'] >= 1]
-print(ox.ts(), 'retained >=1 km2 built-up area urban centers dataset with shape', ucs.shape)
-
-
-# ## Download the urban centers' street networks one at a time
-
-# In[ ]:
-
-
-ucs_to_get = ucs#[ucs['ID_HDC_G0']==10]#.head(10)
-start_time = time.time()
-
-
-# In[ ]:
-print(ox.ts(), 'begin getting', len(ucs_to_get), 'graphs')
-
-for label, row in ucs_to_get.iterrows():
-
-    graph_name = '{}-{}-{}-{}'.format(row['CTR_MN_NM'], row['CTR_MN_ISO'], row['UC_NM_MN'], row['ID_HDC_G0'])
-    print(ox.ts(), graph_name)
-
+def download_data(name, geometry):
     try:
-        G = ox.graph_from_polygon(polygon=row['geometry'].buffer(0),
-                                  network_type=network_type,
-                                  retain_all=retain_all,
-                                  simplify=simplify,
-                                  truncate_by_edge=truncate_by_edge)
-    except ox._errors.CacheOnlyModeInterrupt:
-        # this happens every time because ox.settings.cache_only_mode = True
-        pass
+        ox.graph_from_polygon(
+            polygon=geometry,
+            network_type=network_type,
+            retain_all=retain_all,
+            simplify=simplify,
+            truncate_by_edge=truncate_by_edge,
+        )
+    except ox._errors.CacheOnlyInterruptError:
+        # error on success, because cache_only_mode is True
+        print(ox.ts(), "Finished", name, flush=True)
 
     except Exception as e:
-        ox.log('"{}" failed: {}'.format(graph_name, e), level=lg.ERROR)
-        print(e, graph_name)
+        ox.log(f'"{name}" failed: {e}', level=lg.ERROR)
+        print(name, e)
 
 
-# In[ ]:
+# ucs = ucs.tail(100).sample(len(ucs))
+names = ucs["country_iso"] + "-" + ucs["GC_UCN_MAI_2025"] + "-" + ucs["ID_UC_G0"].astype(str)
+args = zip(names, ucs["geometry"])
 
+print(ox.ts(), f"Downloading {len(ucs):,} graphs' data using {cpus} CPUs")
+start_time = time.time()
 
-end_time = time.time() - start_time
-print(ox.ts(), 'Finished caching raw data for {:,.0f} graphs in {:,.1f} seconds'.format(len(ucs_to_get), end_time))
+with mp.get_context().Pool(cpus) as pool:
+    pool.starmap_async(download_data, args).get()
 
-
-# In[ ]:
-
-
-
-
+elapsed = time.time() - start_time
+msg = f"Finished caching data for {len(ucs):,} graphs in {elapsed:,.0f} seconds"
+print(ox.ts(), msg)
