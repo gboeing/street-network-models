@@ -52,8 +52,9 @@ def set_elevations(fp, df_elev=df_elev, node_dtypes=node_dtypes):
     assert pd.notnull(nodes["elevation"]).all()
     nodes["elevation"] = nodes["elevation"].astype(int)
 
-    # re-save graph with elevation to disk
+    # add elevation to graph nodes, calculate edge grades, then save to disk
     nx.set_node_attributes(G, nodes["elevation"], "elevation")
+    G = ox.add_edge_grades(G, add_absolute=True)
     ox.io.save_graphml(G, fp)
     return nodes
 

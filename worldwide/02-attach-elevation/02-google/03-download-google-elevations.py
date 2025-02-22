@@ -54,7 +54,7 @@ def get_elevations(nodes, url, pause=0):
         df = pd.DataFrame(results, index=literal_eval(nodes))
         if "elevation" not in df.columns:
             cache_filepath = ox._http._resolve_cache_filepath(url)
-            print(ox.ts(), f"{cache_filepath} contains no elevation results")
+            print(ox.ts(), f"No elevation results in {str(cache_filepath)!r}")
             return None
         return df[["elevation", "resolution"]].round(2)
 
@@ -72,7 +72,7 @@ for url in urls["url"]:
 msg = f"Getting {count_cached:,} URLs from cache and {count_uncached:,} from API using {cpus} CPUs"
 print(ox.ts(), msg)
 
-# uncomment this if you want to hit the API (and pay for it)
+# uncomment this if you want to actually hit the API (and pay for it)
 assert count_uncached == 0
 
 # download elevations from Google API in parallel
