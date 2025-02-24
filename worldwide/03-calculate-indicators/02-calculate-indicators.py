@@ -1,266 +1,166 @@
-# In[ ]:
-
-
 import json
 import multiprocessing as mp
-import os
 import random
 import time
+from os.path import getsize
+from pathlib import Path
+from statistics import mean, median
 
 import networkx as nx
-import numpy as np
 import osmnx as ox
 import pandas as pd
 from scipy import stats
 
-print("osmnx version", ox.__version__)
-print("networkx version", nx.__version__)
-
-
-# In[ ]:
-
-
 # load configs
-with open("../config.json") as f:
+with open("./config.json") as f:
     config = json.load(f)
 
-ox.config(log_file=True, logs_folder=config["osmnx_log_path"])
+# configure logging
+ox.settings.log_file = True
+ox.settings.logs_folder = config["osmnx_log_path"]
 
+# configure multiprocessing
 if config["cpus_stats"] == 0:
     cpus = mp.cpu_count()
 else:
     cpus = config["cpus_stats"]
 print(ox.ts(), "using", cpus, "CPUs")
 
-graphml_folder = config["models_graphml_path"]  # where to load graphml files
-indicators_street_path = config["indicators_street_path"]  # where to save output street network indicators
-save_every_n = 100  # save results every n cities
+graphml_folder = Path(config["models_graphml_path"])  # where to load graphml files
+save_path = Path(config["indicators_street_path"])  # where to save indicator output
+save_every_n = 100  # save results to disk every n cities
 
 clean_int_tol = 10  # meters for intersection cleaning tolerance
-
-entropy_bins = 36
+entropy_bins = 36  # how many bins for orientation entropy histogram
 min_entropy_bins = 4  # perfect grid
 perfect_grid = [1] * min_entropy_bins + [0] * (entropy_bins - min_entropy_bins)
 perfect_grid_entropy = stats.entropy(perfect_grid)
 
 
-# In[ ]:
+def intersection_counts(Gup, tolerance=clean_int_tol):
+    results = {}
+    results["intersect_count"] = ox.stats.intersection_count(Gup)
 
-
-# bearing and entropy functions
-def reverse_bearing(x):
-    return x + 180 if x < 180 else x - 180
-
-
-def get_unweighted_bearings(Gu, threshold):
-    # calculate edge bearings
-    # threshold lets you discard streets < some length from the bearings analysis
-    b = pd.Series([d["bearing"] for u, v, k, d in Gu.edges(keys=True, data=True) if d["length"] > threshold])
-    return pd.concat([b, b.map(reverse_bearing)]).reset_index(drop="True")
-
-
-def count_and_merge(n, bearings):
-    # make twice as many bins as desired, then merge them in pairs
-    # prevents bin-edge effects around common values like 0° and 90°
-    n = n * 2
-    bins = np.arange(n + 1) * 360 / n
-    count, _ = np.histogram(bearings, bins=bins)
-
-    # move the last bin to the front, so eg 0.01° and 359.99° will be binned together
-    count = np.roll(count, 1)
-    return count[::2] + count[1::2]
-
-
-def calculate_entropy(data, n):
-    bin_counts = count_and_merge(n, data)
-    entropy = stats.entropy(bin_counts)
-    return entropy
-
-
-def calculate_orientation_entropy(Gu, threshold=10, entropy_bins=entropy_bins):
-    # get edge bearings and calculate entropy of undirected network
-    Gu = ox.add_edge_bearings(Gu)
-    bearings = get_unweighted_bearings(Gu, threshold=threshold)
-    entropy = calculate_entropy(bearings.dropna(), entropy_bins)
-    return entropy
-
-
-def calculate_orientation_order(
-    orientation_entropy, entropy_bins=entropy_bins, perfect_grid_entropy=perfect_grid_entropy
-):
-    max_entropy = np.log(entropy_bins)
-    orientation_order = 1 - ((orientation_entropy - perfect_grid_entropy) / (max_entropy - perfect_grid_entropy)) ** 2
-    return orientation_order
-
-
-# In[ ]:
-
-
-def calculate_circuity(Gu, length_total):
-    coords = np.array(
-        [[Gu.nodes[u]["y"], Gu.nodes[u]["x"], Gu.nodes[v]["y"], Gu.nodes[v]["x"]] for u, v, k in Gu.edges(keys=True)]
-    )
-    df_coords = pd.DataFrame(coords, columns=["u_y", "u_x", "v_y", "v_x"])
-
-    distances = ox.distance.great_circle_vec(
-        lat1=df_coords["u_y"], lng1=df_coords["u_x"], lat2=df_coords["v_y"], lng2=df_coords["v_x"]
-    )
-
-    circuity_avg = length_total / distances.fillna(value=0).sum()
-    return circuity_avg
-
-
-def intersection_counts(Gup, spn, tolerance=clean_int_tol):
-    node_ids = set(Gup.nodes)
-    intersect_count = len([1 for node, count in spn.items() if (count > 1) and (node in node_ids)])
-
-    intersect_count_clean = len(
+    results["intersect_count_clean"] = len(
         ox.consolidate_intersections(Gup, tolerance=tolerance, rebuild_graph=False, dead_ends=False)
     )
 
-    intersect_count_clean_topo = len(
+    results["intersect_count_clean_topo"] = len(
         ox.consolidate_intersections(
             Gup, tolerance=tolerance, rebuild_graph=True, reconnect_edges=False, dead_ends=False
         )
     )
 
-    return intersect_count, intersect_count_clean, intersect_count_clean_topo
+    return results
 
 
-def get_clustering(G):
+def calculate_clustering(G):
+    results = {}
+
     # get directed graph without parallel edges
-    D = ox.get_digraph(G, weight="length")
+    G = ox.convert.to_digraph(G, weight="length")
 
     # average clustering coefficient for the directed graph ignoring parallel edges
-    cc_avg_dir = nx.average_clustering(D)
+    results["cc_avg_dir"] = nx.average_clustering(G)
 
     # average clustering coefficient (weighted) for the directed graph ignoring parallel edges
-    cc_wt_avg_dir = nx.average_clustering(D, weight="length")
+    results["cc_wt_avg_dir"] = nx.average_clustering(G, weight="length")
 
     # max pagerank (weighted) in directed graph ignoring parallel edges
-    pagerank_max = max(nx.pagerank(D, weight="length").values())
+    results["pagerank_max"] = max(nx.pagerank(G, weight="length").values())
 
     # get undirected graph without parallel edges
-    U = nx.Graph(D)
+    G = nx.Graph(G)
 
     # average clustering coefficient for the undirected graph ignoring parallel edges
-    cc_avg_undir = nx.average_clustering(U)
+    results["cc_avg_undir"] = nx.average_clustering(G)
 
     # average clustering coefficient (weighted) for the undirected graph ignoring parallel edges
-    cc_wt_avg_undir = nx.average_clustering(U, weight="length")
+    results["cc_wt_avg_undir"] = nx.average_clustering(G, weight="length")
+    return results
 
-    return cc_avg_dir, cc_avg_undir, cc_wt_avg_dir, cc_wt_avg_undir, pagerank_max
 
-
-# calculate elevation & grade stats
-def elevation_grades(Gu):
-    grades = pd.Series(nx.get_edge_attributes(Gu, "grade_abs"))
-    elevs = pd.Series(nx.get_node_attributes(Gu, "elevation"))
+def calculate_elevation_grades(Gu):
+    # calculate elevation & grade stats
+    grades = pd.Series(nx.get_edge_attributes(Gu, "grade_abs").values())
+    elevs = pd.Series(nx.get_node_attributes(Gu, "elevation").values())
     elev_iqr = elevs.quantile(0.75) - elevs.quantile(0.25)
     elev_range = elevs.max() - elevs.min()
-
-    return (
-        grades.mean(),
-        grades.median(),
-        elevs.mean(),
-        elevs.median(),
-        elevs.std(),
-        elev_range,
-        elev_iqr,
-    )
-
-
-# In[ ]:
+    return {
+        "elev_iqr": elev_iqr,
+        "elev_mean": elevs.mean(),
+        "elev_median": elevs.median(),
+        "elev_range": elev_range,
+        "elev_std": elevs.std(),
+        "grade_mean": grades.mean(),
+        "grade_median": grades.median(),
+    }
 
 
-def save_results(indicators, output_path):
-    output_folder = output_path[: output_path.rfind("/")]
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
-    df = pd.DataFrame(indicators).T.reset_index(drop=True)
-    df.to_csv(output_path, index=False, encoding="utf-8")
-    print(ox.ts(), f'saved {len(indicators)} results to disk at "{output_path}"')
-    return df
+def save_results(results, save_path):
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    df_old = pd.read_csv(save_path)
+    df_new = pd.DataFrame(results)
+    pd.concat([df_old, df_new]).to_csv(save_path, index=False, encoding="utf-8")
+    print(ox.ts(), f"Saved {len(results):,} new results to disk at {str(save_path)!r}")
 
 
-# In[ ]:
+def calculate_graph_stats(graphml_path):
+    start_time = time.time()
+    print(ox.ts(), f"Processing {str(graphml_path)!r}")
+    G = ox.io.load_graphml(graphml_path)
 
-
-def calculate_graph_indicators(graphml_folder, country_folder, filename):
     # get filepath and country/city identifiers
-    filepath = os.path.join(graphml_folder, country_folder, filename)
-    country, country_iso = country_folder.split("-")
-    core_city, uc_id = filename.replace(".graphml", "").split("-")
+    country, country_iso = graphml_path.parent.stem.split("-")
+    core_city, uc_id = graphml_path.stem.split("-")
     uc_id = int(uc_id)
 
-    start_time = time.time()
-    print(ox.ts(), "processing", filepath)
-    G = ox.load_graphml(filepath=filepath)
-
     # clustering and pagerank: needs directed representation
-    cc_avg_dir, cc_avg_undir, cc_wt_avg_dir, cc_wt_avg_undir, pagerank_max = get_clustering(G)
+    clustering_stats = calculate_clustering(G)
 
     # get an undirected representation of this network for everything else
-    Gu = ox.get_undirected(G)
+    Gu = ox.convert.to_undirected(G)
     G.clear()
     G = None
 
     # street lengths
-    lengths = pd.Series(nx.get_edge_attributes(Gu, "length"))
-    length_total = lengths.sum()
-    length_median = lengths.median()
-    length_mean = lengths.mean()
+    lengths = nx.get_edge_attributes(Gu, "length").values()
+    length_total = sum(lengths)
+    length_mean = mean(lengths)
+    length_median = median(lengths)
 
     # nodes, edges, node degree, self loops
     n = len(Gu.nodes)
     m = len(Gu.edges)
     k_avg = 2 * m / n
-    self_loop_proportion = sum(u == v for u, v, k in Gu.edges) / m
+    self_loop_proportion = ox.stats.self_loop_proportion(Gu)
 
     # proportion of 4-way intersections, 3-ways, and dead-ends
-    streets_per_node = nx.get_node_attributes(Gu, "street_count")
-    prop_4way = list(streets_per_node.values()).count(4) / n
-    prop_3way = list(streets_per_node.values()).count(3) / n
-    prop_deadend = list(streets_per_node.values()).count(1) / n
+    spn = ox.stats.streets_per_node_proportions(Gu)
+    prop_4way = spn.get(4, 0)
+    prop_3way = spn.get(4, 0)
+    prop_deadend = spn.get(4, 0)
 
     # average circuity and straightness
-    circuity = calculate_circuity(Gu, length_total)
+    circuity = ox.stats.circuity_avg(Gu)
     straightness = 1 / circuity
 
     # elevation and grade
-    grade_mean, grade_median, elev_mean, elev_median, elev_std, elev_range, elev_iqr = elevation_grades(Gu)
+    elevation_grades = calculate_elevation_grades(Gu)
 
-    # bearing/orientation entropy/order
-    orientation_entropy = calculate_orientation_entropy(Gu)
-    orientation_order = calculate_orientation_order(orientation_entropy)
+    # orientation entropy
+    orientation_entropy = ox.bearing.orientation_entropy(ox.bearing.add_edge_bearings(Gu))
 
     # total and clean intersection counts
-    intersect_count, intersect_count_clean, intersect_count_clean_topo = intersection_counts(
-        ox.project_graph(Gu), streets_per_node
-    )
+    intersection_stats = intersection_counts(ox.project_graph(Gu))
 
     # assemble the results
-    rslt = {
+    results = {
         "country": country,
         "country_iso": country_iso,
         "core_city": core_city,
         "uc_id": uc_id,
-        "cc_avg_dir": cc_avg_dir,
-        "cc_avg_undir": cc_avg_undir,
-        "cc_wt_avg_dir": cc_wt_avg_dir,
-        "cc_wt_avg_undir": cc_wt_avg_undir,
         "circuity": circuity,
-        "elev_iqr": elev_iqr,
-        "elev_mean": elev_mean,
-        "elev_median": elev_median,
-        "elev_range": elev_range,
-        "elev_std": elev_std,
-        "grade_mean": grade_mean,
-        "grade_median": grade_median,
-        "intersect_count": intersect_count,
-        "intersect_count_clean": intersect_count_clean,
-        "intersect_count_clean_topo": intersect_count_clean_topo,
         "k_avg": k_avg,
         "length_mean": length_mean,
         "length_median": length_median,
@@ -268,70 +168,35 @@ def calculate_graph_indicators(graphml_folder, country_folder, filename):
         "street_segment_count": m,
         "node_count": n,
         "orientation_entropy": orientation_entropy,
-        "orientation_order": orientation_order,
-        "pagerank_max": pagerank_max,
         "prop_4way": prop_4way,
         "prop_3way": prop_3way,
         "prop_deadend": prop_deadend,
         "self_loop_proportion": self_loop_proportion,
         "straightness": straightness,
     }
+    results.update(clustering_stats)
+    results.update(elevation_grades)
+    results.update(intersection_stats)
 
     elapsed = time.time() - start_time
-    ox.log(f"finished {filepath} in {elapsed:.0f} seconds")
-    return rslt
+    ox.log(f"finished {graphml_path} in {elapsed:,.0f} seconds")
+    return results
 
 
-# In[ ]:
-indicators = dict()
-if cpus == 1:
-    if os.path.exists(indicators_street_path):
-        indicators = pd.read_csv(indicators_street_path).set_index("uc_id", drop=False).T.to_dict()
+# get all the filepaths that don't already have results in the save file
+done = set(pd.read_csv(save_path)["uc_id"].astype(str))
+filepaths = sorted(graphml_folder.glob("*/*"), key=getsize)
+args = [(fp,) for fp in filepaths if fp.stem.split("-")[1] not in done]
+args = args[0:10]
 
-    counter = 0
-    for country_folder in sorted(os.listdir(graphml_folder)):
-        for filename in sorted(os.listdir(os.path.join(graphml_folder, country_folder))):
-            _, uc_id = filename.replace(".graphml", "").split("-")
-            uc_id = int(uc_id)
-            if uc_id in indicators:
-                # already have indicator results for this one, so skip it
-                print(ox.ts(), "already got", country_folder, filename)
-            else:
-                # calculate indicators for this graph
-                indicators[uc_id] = calculate_graph_indicators(graphml_folder, country_folder, filename)
+# randomly order params so one thread doesn't have to do all the big graphs
+random.shuffle(args)
+msg = f"Calculating stats for {len(args):,} graphs using {cpus} CPUs"
+print(ox.ts(), msg)
 
-                # save periodically
-                counter += 1
-                if counter % save_every_n == 0:
-                    df = save_results(indicators, indicators_street_path)
-else:
-    params = list()
-    for country_folder in sorted(os.listdir(graphml_folder)):
-        for filename in sorted(os.listdir(os.path.join(graphml_folder, country_folder))):
-            params.append((graphml_folder, country_folder, filename))
-
-    # randomly order params so one thread doesn't have to do all the big graphs
-    random.shuffle(params)
-    print(ox.ts(), "processing", len(params), "graphs")
-
-    # create a pool of worker processes then map function/parameters to them
-    pool = mp.Pool(cpus)
-    sma = pool.starmap_async(calculate_graph_indicators, params)
-
-    # get the results, close the pool, wait for worker processes to all exit
-    results = sma.get()
-    pool.close()
-    pool.join()
-
-    for result in results:
-        indicators[result["uc_id"]] = result
-
-
-# In[ ]:
-
+# multiprocess the queue
+with mp.get_context().Pool(cpus) as pool:
+    results = pool.starmap_async(calculate_graph_stats, args).get()
 
 # final save to disk
-df = save_results(indicators, indicators_street_path)
-
-
-# In[ ]:
+save_results(results, save_path)
