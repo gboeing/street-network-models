@@ -1,3 +1,4 @@
+*.ipynb
 *keys.json
 *keys.py
 worldwide/indicators/*

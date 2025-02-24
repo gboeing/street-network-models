@@ -48,13 +48,3 @@ repos:
         args:
           - --line-length=120
           - --no-cache
-
-#  - repo: https://github.com/pre-commit/mirrors-mypy
-#    rev: v1.15.0
-#    hooks:
-#      - id: mypy
-#        additional_dependencies:
-#          - matplotlib
-#          - pandas-stubs
-#          - pytest
-#          - types-requests

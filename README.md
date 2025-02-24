@@ -78,10 +78,6 @@ Build two VRT virtual raster files (one for all the ASTER files and one for all 
 
 Load each GraphML file saved in step 1.3 and add SRTM and ASTER elevation attributes to each node by querying the VRTs then resave the GraphML to disk.
 
-For each country, open each saved graph's GraphML file, extract the nodes' x and y coordinates and append to a DataFrame of all nodes for the country. Save all the node coordinates for each country to disk in the data folder, one csv file per country.
-
-Steps 2.2 - 2.4 are performed in the `aster-srtm` and `google` subfolders to download elevation data for each node from GeoNames ASTER and SRTM APIs and Google Maps Elevation API. You need API keys.
-
 #### 2.2. Google Elevation
 
 ##### 2.2.1. Cluster nodes
@@ -90,7 +86,7 @@ We want to send node coordinates to the elevation API in batches. But the batche
 
 ##### 2.2.2. Make URLs
 
-Load the CSV file of node clusters and construct an API URL for each, with a key.
+Load the CSV file of node clusters and construct an API URL for each, with a key (requires 3 Google API keys).
 
 ##### 2.2.3. Download Google elevations
 
@@ -104,11 +100,11 @@ Load each GraphML file and select either ASTER or SRTM to use as the official no
 
 #### 3.1. Calculate betweenness centrality
 
-TBD
+Load each GraphML file and calculate length-weighted node betweenness centrality for all nodes, using IGraph.
 
 #### 3.2. Calculate indicators
 
-Load each saved graph's GraphML file. Calculate each indicator as described in the indicators metadata file. Save the results to the `indicators-street.csv` file.
+Load each saved graph's GraphML file. Calculate each indicator as described in the indicators metadata file. Save the results to the `indicators-street.csv` file. Save graphs to disk as GeoPackages and node/edge list files.
 
 #### 3.3. Merge indicators
 
