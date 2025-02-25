@@ -1,6 +1,6 @@
 {
   "cpus": 24,
-  "cpus_stats": 6,
+  "cpus_stats": 10,
   "elevation_final_path": "/data/snm/elevation/elevations-final.csv",
   "elevation_google_elevations_path": "/data/snm/elevation/google/elevations-google.csv",
   "elevation_google_urls_path": "/data/snm/elevation/google/urls.csv",

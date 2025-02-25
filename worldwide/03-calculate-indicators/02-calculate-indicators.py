@@ -19,28 +19,20 @@ if config["cpus_stats"] == 0:
     cpus = mp.cpu_count()
 else:
     cpus = config["cpus_stats"]
-print(ox.ts(), "using", cpus, "CPUs")
 
 graphml_folder = Path(config["models_graphml_path"])  # where to load graphml files
 save_path = Path(config["indicators_street_path"])  # where to save indicator output
-clean_int_tol = 10  # meters for intersection cleaning tolerance
 
 
-def intersection_counts(Gup, tolerance=clean_int_tol):
-    results = {}
-    results["intersect_count"] = ox.stats.intersection_count(Gup)
-
-    results["intersect_count_clean"] = len(
-        ox.consolidate_intersections(Gup, tolerance=tolerance, rebuild_graph=False, dead_ends=False)
-    )
-
-    results["intersect_count_clean_topo"] = len(
-        ox.consolidate_intersections(
-            Gup, tolerance=tolerance, rebuild_graph=True, reconnect_edges=False, dead_ends=False
-        )
-    )
-
-    return results
+def intersection_counts(Gup):
+    TOL = 10  # meters for intersection cleaning tolerance
+    icc = len(ox.consolidate_intersections(Gup, tolerance=TOL, rebuild_graph=False))
+    ict = len(ox.consolidate_intersections(Gup, tolerance=TOL, reconnect_edges=False))
+    return {
+        "intersect_count": ox.stats.intersection_count(Gup),
+        "intersect_count_clean": icc,
+        "intersect_count_clean_topo": ict,
+    }
 
 
 def calculate_clustering(G):
@@ -49,10 +41,10 @@ def calculate_clustering(G):
     # get directed graph without parallel edges
     G = ox.convert.to_digraph(G, weight="length")
 
-    # average clustering coefficient for the directed graph ignoring parallel edges
+    # avg clust coeff for directed graph ignoring parallel edges
     results["cc_avg_dir"] = nx.average_clustering(G)
 
-    # average clustering coefficient (weighted) for the directed graph ignoring parallel edges
+    # avg clust coeff (weighted) for directed graph ignoring parallel edges
     results["cc_wt_avg_dir"] = nx.average_clustering(G, weight="length")
 
     # max pagerank (weighted) in directed graph ignoring parallel edges
@@ -61,10 +53,10 @@ def calculate_clustering(G):
     # get undirected graph without parallel edges
     G = nx.Graph(G)
 
-    # average clustering coefficient for the undirected graph ignoring parallel edges
+    # avg clust coeff for undirected graph ignoring parallel edges
     results["cc_avg_undir"] = nx.average_clustering(G)
 
-    # average clustering coefficient (weighted) for the undirected graph ignoring parallel edges
+    # avg clust coeff (weighted) for undirected graph ignoring parallel edges
     results["cc_wt_avg_undir"] = nx.average_clustering(G, weight="length")
     return results
 
@@ -134,8 +126,8 @@ def calculate_graph_stats(graphml_path):
     # proportion of 4-way intersections, 3-ways, and dead-ends
     spn = ox.stats.streets_per_node_proportions(Gu)
     prop_4way = spn.get(4, 0)
-    prop_3way = spn.get(4, 0)
-    prop_deadend = spn.get(4, 0)
+    prop_3way = spn.get(3, 0)
+    prop_deadend = spn.get(0, 0)
 
     # betweenness centrality stats
     bc = list(nx.get_node_attributes(Gu, "bc").values())

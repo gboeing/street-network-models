@@ -96,29 +96,29 @@ Request each URL and save node ID and elevation to disk for all nodes.
 
 Load each GraphML file and select either ASTER or SRTM to use as the official node elevation value, for each node, based on which is closer to the Google value (as a tie-breaker). Calculate all edge grades and add as edge attributes. Re-save graph to disk as GraphML.
 
-### 3. Calculate indicators
+### 3. Calculate stats
 
 #### 3.1. Calculate betweenness centrality
 
 Load each GraphML file and calculate length-weighted node betweenness centrality for all nodes, using IGraph.
 
-#### 3.2. Calculate indicators
+#### 3.2. Calculate stats
 
-Load each saved graph's GraphML file. Calculate each indicator as described in the indicators metadata file. Save the results to the `indicators-street.csv` file. Save graphs to disk as GeoPackages and node/edge list files.
+Load each saved graph's GraphML file. Calculate each measure as described in the metadata file.
 
-#### 3.3. Merge indicators
+#### 3.3. Merge stats
 
-Merge the `indicators-street.csv` indicators with the urban centers indicators from the geopackage file described in 1.1. Save to disk with indicators named as described in the indicators metadata file.
+Merge the street network stats with the urban centers stats from the GeoPackage file described in step 1.1. Save to disk with measures named as described in the metadata file.
 
 #### 3.4. Create metadata
 
-Create metadata files for the graph nodes, graph edges, and indicators.
+Create metadata files for the graph nodes, graph edges, and stats.
 
 ### 4. Upload repository
 
 #### 4.1. Generate files
 
-Save GeoPackages and node/edge list files.
+Save graphs to disk as GeoPackages and node/edge list files.
 
 #### 4.2. File checks
 
