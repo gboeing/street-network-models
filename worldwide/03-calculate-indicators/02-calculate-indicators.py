@@ -1,15 +1,14 @@
 import json
 import multiprocessing as mp
 import random
-import time
 from os.path import getsize
 from pathlib import Path
 from statistics import mean, median
 
 import networkx as nx
+import numpy as np
 import osmnx as ox
 import pandas as pd
-from scipy import stats
 
 # load configs
 with open("./config.json") as f:
@@ -24,13 +23,7 @@ print(ox.ts(), "using", cpus, "CPUs")
 
 graphml_folder = Path(config["models_graphml_path"])  # where to load graphml files
 save_path = Path(config["indicators_street_path"])  # where to save indicator output
-save_every_n = 100  # save results to disk every n cities
-
 clean_int_tol = 10  # meters for intersection cleaning tolerance
-entropy_bins = 36  # how many bins for orientation entropy histogram
-min_entropy_bins = 4  # perfect grid
-perfect_grid = [1] * min_entropy_bins + [0] * (entropy_bins - min_entropy_bins)
-perfect_grid_entropy = stats.entropy(perfect_grid)
 
 
 def intersection_counts(Gup, tolerance=clean_int_tol):
@@ -93,18 +86,25 @@ def calculate_elevation_grades(Gu):
     }
 
 
+def gini(x):
+    sorted_x = np.sort(x)
+    n = len(x)
+    cumx = np.cumsum(sorted_x, dtype=float)
+    return (n + 1 - 2 * np.sum(cumx) / cumx[-1]) / n
+
+
 def save_results(results, save_path):
     save_path.parent.mkdir(parents=True, exist_ok=True)
-    df_old = pd.read_csv(save_path)
-    df_new = pd.DataFrame(results)
-    pd.concat([df_old, df_new]).to_csv(save_path, index=False, encoding="utf-8")
+    df = pd.DataFrame(results)
+    if save_path.is_file():
+        df = pd.concat([pd.read_csv(save_path), df])
+    df.to_csv(save_path, index=False, encoding="utf-8")
     print(ox.ts(), f"Saved {len(results):,} new results to disk at {str(save_path)!r}")
 
 
 def calculate_graph_stats(graphml_path):
-    start_time = time.time()
     print(ox.ts(), f"Processing {str(graphml_path)!r}")
-    G = ox.io.load_graphml(graphml_path)
+    G = ox.io.load_graphml(graphml_path, node_dtypes={"bc": float})
 
     # get filepath and country/city identifiers
     country, country_iso = graphml_path.parent.stem.split("-")
@@ -136,6 +136,11 @@ def calculate_graph_stats(graphml_path):
     prop_4way = spn.get(4, 0)
     prop_3way = spn.get(4, 0)
     prop_deadend = spn.get(4, 0)
+
+    # betweenness centrality stats
+    bc = list(nx.get_node_attributes(Gu, "bc").values())
+    bc_gini = gini(bc)
+    bc_max = max(bc)
 
     # average circuity and straightness
     circuity = ox.stats.circuity_avg(Gu)
@@ -169,18 +174,17 @@ def calculate_graph_stats(graphml_path):
         "prop_deadend": prop_deadend,
         "self_loop_proportion": self_loop_proportion,
         "straightness": straightness,
+        "bc_gini": bc_gini,
+        "bc_max": bc_max,
     }
     results.update(clustering_stats)
     results.update(elevation_grades)
     results.update(intersection_stats)
-
-    elapsed = time.time() - start_time
-    ox.log(f"finished {graphml_path} in {elapsed:,.0f} seconds")
     return results
 
 
 # get all the filepaths that don't already have results in the save file
-done = set(pd.read_csv(save_path)["uc_id"].astype(str))
+done = set(pd.read_csv(save_path)["uc_id"].astype(str)) if save_path.is_file() else set()
 filepaths = sorted(graphml_folder.glob("*/*"), key=getsize)
 args = [(fp,) for fp in filepaths if fp.stem.split("-")[1] not in done]
 
