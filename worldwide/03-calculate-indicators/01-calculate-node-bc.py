@@ -26,34 +26,34 @@ save_folder = Path(config["node_bc_path"])
 save_folder.mkdir(parents=True, exist_ok=True)
 
 
-def convert_igraph(g_nx, weight_attr):
+def convert_igraph(G_nx, weight_attr):
     # relabel graph nodes as integers for igraph to ingest
-    g_nx = nx.relabel.convert_node_labels_to_integers(g_nx)
+    G_nx = nx.relabel.convert_node_labels_to_integers(G_nx)
 
     # create igraph graph and add nodes/edges
-    g_ig = ig.Graph(directed=True)
-    g_ig.add_vertices(g_nx.nodes)
-    g_ig.add_edges(g_nx.edges(keys=False))
+    G_ig = ig.Graph(directed=True)
+    G_ig.add_vertices(G_nx.nodes)
+    G_ig.add_edges(G_nx.edges(keys=False))
 
     # add edge weights and ensure values >0 for igraph
-    weights = nx.get_edge_attributes(g_nx, weight_attr).values()
+    weights = nx.get_edge_attributes(G_nx, weight_attr).values()
     weights = (0.001 if w == 0 else w for w in weights)
-    g_ig.es[weight_attr] = list(weights)
-    return g_ig
+    G_ig.es[weight_attr] = list(weights)
+    return G_ig
 
 
 def calculate_bc(fp, save_path, weight_attr=WEIGHT_ATTR):
     print(ox.ts(), f"{str(fp)!r}")
 
     # load graphml, convert to igraph, calculate bc, and normalize values
-    g_nx = ox.io.load_graphml(fp)
-    bc_raw = convert_igraph(g_nx, weight_attr).betweenness(weights=weight_attr)
-    bc_norm = (x / (len(g_nx) - 1) / (len(g_nx) - 2) for x in bc_raw)
-    osmid_bc = dict(zip(g_nx.nodes, bc_norm, strict=True))
+    G_nx = ox.io.load_graphml(fp)
+    bc_raw = convert_igraph(G_nx, weight_attr).betweenness(weights=weight_attr)
+    bc_norm = (x / (len(G_nx) - 1) / (len(G_nx) - 2) for x in bc_raw)
+    osmid_bc = dict(zip(G_nx.nodes, bc_norm, strict=True))
 
     # set graph node attributes and re-save graphml file
-    nx.set_node_attributes(g_nx, osmid_bc, name="bc")
-    ox.io.save_graphml(g_nx, fp)
+    nx.set_node_attributes(G_nx, osmid_bc, name="bc")
+    ox.io.save_graphml(G_nx, fp)
 
     # also save results to disk as JSON
     with save_path.open("w") as f:
