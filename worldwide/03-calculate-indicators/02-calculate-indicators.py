@@ -184,9 +184,9 @@ def calculate_graph_stats(graphml_path):
 
 
 # get all the filepaths that don't already have results in the save file
-done = set(pd.read_csv(save_path)["uc_id"].astype(str)) if save_path.is_file() else set()
+done = set(pd.read_csv(save_path)["uc_id"]) if save_path.is_file() else set()
 filepaths = sorted(graphml_folder.glob("*/*"), key=getsize)
-args = [(fp,) for fp in filepaths if fp.stem.split("-")[1] not in done]
+args = [(fp,) for fp in filepaths if int(fp.stem.split("-")[1]) not in done]
 
 # randomly order params so one thread doesn't have to do all the big graphs
 random.shuffle(args)
