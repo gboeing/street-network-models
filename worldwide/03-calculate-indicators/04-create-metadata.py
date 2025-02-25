@@ -1,34 +1,24 @@
-# In[ ]:
-
-
 import json
-from collections import OrderedDict
 
 import osmnx as ox
 import pandas as pd
 
-# In[ ]:
-
-
 # load configs
-with open("../config.json") as f:
+with open("./config.json") as f:
     config = json.load(f)
 
-indicators_path = config["indicators_all_path"]  # all indicators data
-indicators_metadata_path = config["indicators_metadata_path"]  # output indicators metadata (subset for repo)
-indicators_all_metadata_path = config["indicators_all_metadata_path"]  # output indicators metadata (all for analysis)
-nodes_metadata_path = config["models_metadata_nodes_path"]  # output graph nodes metadata
-edges_metadata_path = config["models_metadata_edges_path"]  # output graph edges metadata
+ind_path = config["indicators_path"]  # indicators data (repo subset)
+ind_all_path = config["indicators_all_path"]  # all indicators data
+ind_meta_path = config["indicators_metadata_path"]  # indicators metadata (repo subset)
+ind_all_meta_path = config["indicators_all_metadata_path"]  # indicators metadata (all)
+nodes_meta_path = config["models_metadata_nodes_path"]  # graph nodes metadata
+edges_meta_path = config["models_metadata_edges_path"]  # graph edges metadata
 
-
-# In[ ]:
-
-
-# graph nodes metadata
-desc = OrderedDict()
+# create graph nodes metadata
+desc = {}
 desc["osmid"] = {"description": "Unique OSM node ID", "type": "int"}
-desc["x"] = {"description": "Longitude coordinate (epsg:4326)", "type": "float"}
-desc["y"] = {"description": "Latitude coordinate (epsg:4326)", "type": "float"}
+desc["x"] = {"description": "Longitude coordinate (EPSG:4326)", "type": "float"}
+desc["y"] = {"description": "Latitude coordinate (EPSG:4326)", "type": "float"}
 desc["elevation"] = {
     "description": "Node elevation (meters above sea level) from ASTER or SRTM",
     "type": "int",
@@ -42,153 +32,121 @@ desc["elevation_srtm"] = {
     "type": "int",
 }
 desc["street_count"] = {
-    "description": "Number of physical streets segments connected to this node",
+    "description": "Number of physical street segments connected to this node",
     "type": "int",
+}
+desc["bc"] = {
+    "description": "Normalized distance-weighted node betweenness centrality",
+    "type": "float",
 }
 desc["other attributes"] = {"description": "As defined in OSM documentation", "type": ""}
 
-# save metadata to disk
-nodes_metadata = pd.DataFrame(desc).T.reset_index().rename(columns={"index": "indicator"})
-nodes_metadata.to_csv(nodes_metadata_path, index=False, encoding="utf-8")
-print(ox.ts(), "saved graph nodes metadata to disk", nodes_metadata_path)
+# save nodes metadata to disk
+nodes_meta = pd.DataFrame(desc).T.reset_index().rename(columns={"index": "indicator"})
+nodes_meta.to_csv(nodes_meta_path, index=False, encoding="utf-8")
+print(ox.ts(), f"Saved graph nodes metadata to {str(nodes_meta_path)!r}")
 
-
-# In[ ]:
-
-
-# graph edges metadata
-desc = OrderedDict()
+# create graph edges metadata
+desc = {}
 desc["u"] = {"description": "Unique OSM ID of source node", "type": "int"}
 desc["v"] = {"description": "Unique OSM ID of destination node", "type": "int"}
 desc["key"] = {"description": "Unique ID if parallel edges exist between u and v", "type": "int"}
 desc["osmid"] = {"description": "Unique OSM way ID", "type": "int"}
-desc["geometry"] = {"description": "Edge centerline geometry (epsg:4326)", "type": "linestring"}
-desc["oneway"] = {"description": "Is edge part of a one-way street", "type": "boolean"}
+desc["geometry"] = {"description": "Edge centerline geometry (EPSG:4326)", "type": "linestring"}
 desc["length"] = {"description": "Length along the edge (meters)", "type": "float"}
 desc["grade"] = {"description": "Edge grade (rise over run)", "type": "float"}
 desc["grade_abs"] = {"description": "Absolute value of edge grade", "type": "float"}
+desc["oneway"] = {"description": "Whether edge part of a one-way street", "type": "boolean"}
+desc["reversed"] = {"description": "Whether edge runs opposite direction of OSM way", "type": "boolean"}
 desc["other attributes"] = {"description": "As defined in OSM documentation", "type": ""}
 
-# save metadata to disk
-edges_metadata = pd.DataFrame(desc).T.reset_index().rename(columns={"index": "indicator"})
-edges_metadata.to_csv(edges_metadata_path, index=False, encoding="utf-8")
-print(ox.ts(), "saved graph edges metadata to disk", edges_metadata_path)
+# save edges metadata to disk
+edges_meta = pd.DataFrame(desc).T.reset_index().rename(columns={"index": "indicator"})
+edges_meta.to_csv(edges_meta_path, index=False, encoding="utf-8")
+print(ox.ts(), f"Saved graph edges metadata to {str(edges_meta_path)!r}")
 
-
-# In[ ]:
-
-
-# indicators metadata
-desc = OrderedDict()
-desc["country"] = "Main country name"
-desc["country_iso"] = "Main country ISO 3166-1 alpha-3 code"
-desc["core_city"] = "Urban center core city name"
-desc["uc_id"] = "Urban center unique ID"
-desc["cc_avg_dir"] = "Average clustering coefficient (directed)"
-desc["cc_avg_undir"] = "Average clustering coefficient (undirected)"
+# create indicators metadata
+desc = {}
+desc["area_km2"] = "Area within urban center boundary polygon, km2 (GHS)"
+desc["avg_elevation"] = "Average elevation, meters above sea level (GHS)"
+desc["avg_precipitation"] = "Annual average precipitation, millimeters (GHS)"
+desc["avg_temperature"] = "Average temperature, celsius (GHS)"
+desc["bc_gini"] = "Gini coefficient of normalized distance-weighted node betweenness centralities"
+desc["bc_max"] = "Max normalized distance-weighted node betweenness centralities"
+desc["built_height_m"] = "Average height of built surfaces, meters (GHS)"
+desc["built_up_area_m2"] = "Built-up surface area, square meters (GHS)"
+desc["built_up_area_percap"] = "Built-up surface area per-capita, square meters per person (GHS)"
+desc["cc_avg_dir"] = "Average clustering coefficient (unweighted/directed)"
+desc["cc_avg_undir"] = "Average clustering coefficient (unweighted/undirected)"
 desc["cc_wt_avg_dir"] = "Average clustering coefficient (weighted/directed)"
 desc["cc_wt_avg_undir"] = "Average clustering coefficient (weighted/undirected)"
 desc["circuity"] = "Ratio of street lengths to straightline distances"
+desc["core_city"] = "Urban center core city name"
+desc["country"] = "Primary country name"
+desc["country_iso"] = "Primary country ISO 3166-1 alpha-3 code"
 desc["elev_iqr"] = "Interquartile range of node elevations, meters"
 desc["elev_mean"] = "Mean node elevation, meters"
 desc["elev_median"] = "Median node elevation, meters"
 desc["elev_range"] = "Range of node elevations, meters"
-desc["elev_std"] = "Standard deviation of node elevations, meter"
+desc["elev_std"] = "Standard deviation of node elevations, meters"
+desc["gdp_ppp"] = "Total GDP PPP, USD (GHS)"
 desc["grade_mean"] = "Mean absolute street grade (incline)"
 desc["grade_median"] = "Median absolute street grade (incline)"
+desc["hdi"] = "Human development index at subnational level (GHS)"
 desc["intersect_count"] = "Count of (undirected) edge intersections"
-desc["intersect_count_clean"] = "Count of street intersections (after merging nodes within 10 meters geometrically)"
-desc["intersect_count_clean_topo"] = (
-    "Count of street intersections (after merging nodes within 10 meters topologically)"
-)
+desc["intersect_count_clean"] = "Count of street intersections (merged within 10 meters geometrically)"
+desc["intersect_count_clean_topo"] = "Count of street intersections (merged within 10 meters topologically)"
 desc["k_avg"] = "Average node degree (undirected)"
+desc["koppen_geiger"] = "Köppen-Geiger classification of majority of surface (GHS)"
+desc["land_use_efficiency"] = "Land use efficiency 1990-2015 (GHS)"
 desc["length_mean"] = "Mean street segment length (undirected edges), meters"
 desc["length_median"] = "Median street segment length (undirected edges), meters"
 desc["length_total"] = "Total street length (undirected edges), meters"
 desc["node_count"] = "Count of nodes"
 desc["orientation_entropy"] = "Entropy of street network bearings"
-desc["orientation_order"] = "Orientation order of street network bearings"
 desc["pagerank_max"] = "The maximum PageRank value of any node"
+desc["pm25_concentration"] = "Population-weighted average PM2.5 concentrations, micrograms/meter^3 (GHS)"
+desc["pop_greenness"] = "Land consumption rate / population growth rate (GHS)"
 desc["prop_4way"] = "Proportion of nodes that represent 4-way street intersections"
 desc["prop_3way"] = "Proportion of nodes that represent 3-way street intersections"
 desc["prop_deadend"] = "Proportion of nodes that represent dead-ends"
+desc["resident_pop"] = "Total resident population (GHS)"
 desc["self_loop_proportion"] = "Proportion of edges that are self-loops"
 desc["straightness"] = "1 / circuity"
 desc["street_segment_count"] = "Count of streets (undirected edges)"
-desc["uc_names"] = "List of city names within this urban center (GISCO)"
-desc["world_region"] = "Major geographical region (UN WUP)"
-desc["world_subregion"] = "Minor geographical region (UN WUP)"
-desc["resident_pop"] = "Total resident population in 2015 (GHS)"
-desc["area"] = "Area within urban center boundary polygon, km2 (GHS)"
-desc["built_up_area"] = "Built-up surface area in 2015, km2 (GHS)"
-desc["night_light_em"] = ("Average nighttime light emission in 2015, nano-watts per steradian per cm2 (Weiss)",)
-desc["gdp_ppp"] = "Sum of GDP PPP values for 2015, in 2011 USD (Kummu)"
-desc["un_income_class"] = "UN income class (UNDESA)"
-desc["un_dev_group"] = "UN development group (UNDESA)"
-desc["transport_co2_em_fossil"] = (
-    "Total transport-sector co2 emissions from non-short-cycle-organic fuels in 2015, 10^3 kg/year (Crippa)"
-)
-desc["transport_co2_em_bio"] = (
-    "Total transport-sector co2 emissions from short-cycle-organic fuels in 2015, 10^3 kg/year (Crippa)"
-)
-desc["transport_pm25_em"] = (
-    "Total transport-sector emissions of particular matter <2.5 microns in 2015, 10^3 kg/year (Crippa)"
-)
-desc["pm25_concentration"] = (
-    "Concentration of particular matter <2.5 microns for 2014, micrograms per cubic meter air (GBD)"
-)
-desc["climate_classes"] = "Climate classes (Rubel)"
-desc["avg_elevation"] = "Average elevation, m above sea level (EORC and JAXA)"
-desc["avg_precipitation"] = "Average precipitation for 2014, mm (Harris)"
-desc["avg_temperature"] = "Average temperature for 2014, celsius (Harris)"
-desc["land_use_efficiency"] = "Land use efficiency 1990-2015 (Melchiorri)"
-desc["pct_open_space"] = "Percent open space (JRC)"
-desc["centroid_lng"] = "Longitude of the area centroid, decimal degrees"
-desc["centroid_lat"] = "Latitude of the area centroid, decimal degrees"
+desc["transport_co2_em"] = "Total CO2 emissions from transport sector, tons/year (GHS)"
+desc["transport_pm25_em"] = "Total PM2.5 emissions from transport sector, tons/year (GHS)"
+desc["uc_id"] = "Urban center unique ID (GHS)"
+desc["uc_names"] = "List of city names within this urban center (GHS)"
+desc["world_bank_income_group"] = "World Bank income group"
+desc["world_region"] = "UN SDG geographic region"
 
 # turn the metadata descriptions into a dataframe
-metadata = pd.DataFrame(desc, index=["description"]).T
+meta = pd.DataFrame(desc, index=["description"]).T
 
 # make sure we have metadata for all indicators
-ind = pd.read_csv(indicators_path)
-assert len(ind.columns) == len(metadata)
+ind_all = pd.read_csv(ind_all_path)
+assert len(ind_all.columns) == len(meta)
 
 # reindex df so cols are in same order as metadata
-ind = ind.reindex(columns=metadata.index).dropna()
+ind_all = ind_all.reindex(columns=meta.index).dropna()
 
 # add data type of each field
-dtypes = ind.dtypes.astype(str).replace({"object": "string"}).str.replace("64", "")
+dtypes = ind_all.dtypes.astype(str).replace({"object": "string"}).str.replace("64", "")
 dtypes.name = "type"
-metadata = metadata.merge(right=dtypes, left_index=True, right_index=True).reindex(columns=["type", "description"])
+meta = meta.merge(right=dtypes, left_index=True, right_index=True).reindex(columns=["type", "description"])
 
 # make sure all the indicators are present in the metadata
-assert (metadata.index == ind.columns).all()
+assert (meta.index == ind_all.columns).all()
 
 # save all metadata to disk
-metadata_all = metadata.reset_index().rename(columns={"index": "indicator"})
-metadata_all.to_csv(indicators_all_metadata_path, index=False, encoding="utf-8")
-print(ox.ts(), "saved all indicator metadata to disk", indicators_all_metadata_path)
-
+meta_all = meta.reset_index().rename(columns={"index": "indicator"})
+meta_all.to_csv(ind_all_meta_path, index=False, encoding="utf-8")
+print(ox.ts(), f"Saved all indicator metadata to {str(ind_all_meta_path)!r}")
 
 # drop fields that should not go in our repo then save
-drop = [
-    "night_light_em",
-    "gdp_ppp",
-    "un_income_class",
-    "un_dev_group",
-    "transport_co2_em_fossil",
-    "transport_co2_em_bio",
-    "transport_pm25_em",
-    "pm25_concentration",
-    "climate_classes",
-    "avg_elevation",
-    "avg_precipitation",
-    "avg_temperature",
-    "land_use_efficiency",
-    "pct_open_space",
-    "centroid_lat",
-    "centroid_lng",
-]
-metadata = metadata.drop(labels=drop).reset_index().rename(columns={"index": "indicator"})
-metadata.to_csv(indicators_metadata_path, index=False, encoding="utf-8")
-print(ox.ts(), "saved repo indicator metadata to disk", indicators_metadata_path)
+repo_cols = set(pd.read_csv(ind_path).columns)
+keep = [k for k in desc.keys() if k in repo_cols]
+meta = meta.loc[keep].reset_index().rename(columns={"index": "indicator"})
+meta.to_csv(ind_meta_path, index=False, encoding="utf-8")
+print(ox.ts(), f"Saved repo indicator metadata to {str(ind_meta_path)!r}")

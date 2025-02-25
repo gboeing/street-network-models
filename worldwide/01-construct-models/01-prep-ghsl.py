@@ -67,8 +67,8 @@ cols = [
     "GE_ELV_AVG_2025",  # average elevation (m)
     "CL_B12_CUR_2010",  # average annual precipitation in the decade (mm/year)
     "CL_B01_CUR_2010",  # annual mean temperature in the decade (°C)
-    "SD_LUE_LPR_2000_2020",  # land use efficiency = land consump rate / pop growth rate
     "SD_POP_HGR_2025",  # share of pop living in area of high greenness
+    "SD_LUE_LPR_2000_2020",  # land use efficiency = land consump rate / pop growth rate
     "geometry",  # urban center geometry
 ]
 

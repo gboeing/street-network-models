@@ -41,10 +41,10 @@ repos:
       - id: ruff
         args:
           - --fix
-          - --line-length=120
+          - --line-length=110
           - --select=A,B,E,F,I,UP,W
           - --no-cache
       - id: ruff-format
         args:
-          - --line-length=120
+          - --line-length=110
           - --no-cache
