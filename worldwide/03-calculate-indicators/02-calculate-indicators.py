@@ -15,10 +15,6 @@ from scipy import stats
 with open("./config.json") as f:
     config = json.load(f)
 
-# configure logging
-ox.settings.log_file = True
-ox.settings.logs_folder = config["osmnx_log_path"]
-
 # configure multiprocessing
 if config["cpus_stats"] == 0:
     cpus = mp.cpu_count()
@@ -187,7 +183,6 @@ def calculate_graph_stats(graphml_path):
 done = set(pd.read_csv(save_path)["uc_id"].astype(str))
 filepaths = sorted(graphml_folder.glob("*/*"), key=getsize)
 args = [(fp,) for fp in filepaths if fp.stem.split("-")[1] not in done]
-args = args[0:10]
 
 # randomly order params so one thread doesn't have to do all the big graphs
 random.shuffle(args)
