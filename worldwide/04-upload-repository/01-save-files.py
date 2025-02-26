@@ -3,6 +3,7 @@ import multiprocessing as mp
 from pathlib import Path
 
 import osmnx as ox
+import pandas as pd
 
 # load configs
 with open("./config.json") as f:
@@ -22,7 +23,10 @@ nelist_folder = Path(config["models_nelist_path"])  # where to save node/edge li
 
 # function to convert node elevation string -> float -> int
 def to_int(value):
-    int(float(value))
+    try:
+        return int(float(value))
+    except ValueError:
+        return float(value)
 
 
 node_dtypes = {"bc": float, "elevation_aster": to_int, "elevation_srtm": to_int}
@@ -90,10 +94,38 @@ def make_args():
         if not (gpkg_path.is_file() and nodes_path.is_file() and edges_path.is_file()):
             args.append((fp, gpkg_path, nodes_path, edges_path))
 
-    print(ox.ts(), f"Saving GeoPackage + node/edge lists for {len(args):,} remaining graphs")
+    print(ox.ts(), f"Saving GeoPackage and node/edge lists for {len(args):,} remaining graphs")
     return args
 
 
 # multiprocess the queue
 with mp.get_context().Pool(cpus) as pool:
     pool.starmap_async(save_graph, make_args()).get()
+
+# final file count checks
+# verify same number of country folders across all file types
+graphml_countries = list(graphml_folder.glob("*"))
+gpkg_countries = list(gpkg_folder.glob("*"))
+nelist_countries = list(nelist_folder.glob("*"))
+assert len(graphml_countries) == len(gpkg_countries) == len(nelist_countries)
+
+# verify same number of model files across all file types
+graphml_paths = list(graphml_folder.glob("*/*.graphml"))
+gpkg_paths = list(gpkg_folder.glob("*/*.gpkg"))
+nlist_paths = list(nelist_folder.glob("*/*/node_list.csv"))
+elist_paths = list(nelist_folder.glob("*/*/edge_list.csv"))
+assert len(graphml_paths) == len(gpkg_paths) == len(nlist_paths) == len(elist_paths)
+
+# verify same countries/cities across all file types
+graphml_names = set(fp.parent.stem + "/" + fp.stem for fp in graphml_paths)
+gpkg_names = set(fp.parent.stem + "/" + fp.stem for fp in gpkg_paths)
+nelist_names = set(fp.parent.stem + "/" + fp.stem for fp in nelist_folder.glob("*/*"))
+assert graphml_names == gpkg_names == nelist_names
+
+# verify an indicator row exists for every GraphML file
+df = pd.read_csv(config["indicators_path"])
+ucids1 = set(df["uc_id"].astype(str).values)
+ucids2 = set(fp.stem.split("-")[1] for fp in graphml_paths)
+assert ucids1 == ucids2
+
+print(ox.ts(), "Successfully passed all file checks")
