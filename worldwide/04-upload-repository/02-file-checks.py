@@ -38,7 +38,9 @@ for country in os.listdir(nelist_folder):
 
 # check that we have the same number of country folders for each file type
 lens = len(os.listdir(nelist_folder)), len(os.listdir(gpkg_folder)), len(os.listdir(graphml_folder))
-country_check = len(os.listdir(nelist_folder)) == len(os.listdir(gpkg_folder)) == len(os.listdir(graphml_folder))
+country_check = (
+    len(os.listdir(nelist_folder)) == len(os.listdir(gpkg_folder)) == len(os.listdir(graphml_folder))
+)
 print("same number of country folders for each file type:", lens, country_check)
 
 

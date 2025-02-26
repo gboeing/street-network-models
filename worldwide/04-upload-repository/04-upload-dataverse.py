@@ -199,7 +199,9 @@ def get_uploaded_draft_filenames(doi):
 
 # get all the filenames that currently exist in the latest published dataset
 def get_published_files(doi):
-    endpoint = f"api/v1/datasets/:persistentId/versions/:latest-published/files?key={api_key}&persistentId={doi}"
+    endpoint = (
+        f"api/v1/datasets/:persistentId/versions/:latest-published/files?key={api_key}&persistentId={doi}"
+    )
     url = os.path.join(host, endpoint)
     response = requests.get(url)
     response_json = response.json()
@@ -269,7 +271,7 @@ def get_preexisting_files(manifests):
         published_files[doi] = get_published_files(doi)
         print(
             ox.ts(),
-            f"Pre-existing files in {doi}: {len(published_files[doi])} published, {len(already_uploaded[doi])} draft.",
+            f"Files in {doi}: {len(published_files[doi])} published, {len(already_uploaded[doi])} draft.",
         )
 
     return already_uploaded, published_files
