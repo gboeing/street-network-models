@@ -13,7 +13,7 @@
   "indicators_all_path": "/data/snm/indicators/indicators-all.csv",
   "indicators_metadata_path": "/data/snm/indicators/metadata-indicators.csv",
   "indicators_path": "/data/snm/indicators/indicators.csv",
-  "indicators_street_path": "/data/snm/indicators/temp/indicators-street.csv",
+  "indicators_street_path": "/data/snm/indicators/indicators-street-network.csv",
   "iso_codes_path": "/data/snm/inputs/wikipedia-iso-country-codes.csv",
   "models_gpkg_path": "/data/snm/models/gpkg",
   "models_graphml_path": "/data/snm/models/graphml",
