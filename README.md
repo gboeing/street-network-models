@@ -118,17 +118,13 @@ Create metadata files for the graph nodes, graph edges, and stats.
 
 #### 4.1. Generate files
 
-Save graphs to disk as GeoPackages and node/edge list files.
+Save graphs to disk as GeoPackages and node/edge list files. Then ensure we have what we expect: verify that we have the same number of countries for each file type, the same number of gpkg, graphml, and node/edge list files, and that the same set of country/city names exists across gkpg, graphml, and node/edge lists.
 
-#### 4.2. File checks
+#### 4.2. Stage files
 
-Before staging files for repository deposit, ensure we have what we expect. Verify that we have the same number of countries for each file type, the same number of gpkg, graphml, and node/edge list files, and that the same set of country/city names exists across gkpg, graphml, and node/edge lists.
+Compress and zip all model files (GeoPackages, GraphML, node/edge lists) into a staging area for upload to Dataverse.
 
-#### 4.3. Stage files
-
-Compress and zip all model files (geopackages, graphml, node/edge lists) into a staging area for upload to Dataverse.
-
-#### 4.4. Upload dataverse
+#### 4.3. Upload dataverse
 
 Upload to Dataverse using their [native](http://guides.dataverse.org/en/latest/api/native-api.html) and [sword](http://guides.dataverse.org/en/latest/api/sword.html) APIs. First [log in](https://dataverse.harvard.edu) and create an API key if you don't have an active one (they expire annually). If this is a revision to the datasets, create a draft dataset revision on the dataverse (edit > edit metadata > change something > save). Otherwise, if this is the first file upload, create a new dataverse and new empty datasets within it, structured like:
 

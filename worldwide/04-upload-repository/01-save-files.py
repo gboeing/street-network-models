@@ -82,10 +82,10 @@ def save_graph(graphml_path, gpkg_path, nodes_path, edges_path, node_dtypes=node
 
 
 def make_args():
-    args = []
     filepaths = sorted(graphml_folder.glob("*/*"))
     print(ox.ts(), f"There are {len(filepaths):,} total GraphML files")
 
+    args = []
     for fp in filepaths:
         gpkg_path = gpkg_folder / fp.parent.stem / fp.name.replace("graphml", "gpkg")
         nelist_output_folder = nelist_folder / fp.parent.stem / fp.stem
