@@ -13,8 +13,8 @@ python ./02-attach-elevation/02-google/03-download-google-elevations.py
 python ./02-attach-elevation/02-google/04-choose-best-elevation.py
 python ./03-calculate-indicators/01-calculate-node-bc.py
 python ./03-calculate-indicators/02-calculate-indicators.py
-#python ./03-calculate-indicators/03-merge-indicators.py
-#python ./03-calculate-indicators/04-create-metadata.py
-#python ./04-upload-repository/01-file-checks.py
-#python ./04-upload-repository/02-stage-files.py
-#python ./04-upload-repository/03-upload-dataverse.py
+python ./03-calculate-indicators/03-merge-indicators.py
+python ./03-calculate-indicators/04-create-metadata.py
+python ./04-upload-repository/01-save-files.py
+python ./04-upload-repository/02-stage-files.py
+python ./04-upload-repository/03-upload-dataverse.py

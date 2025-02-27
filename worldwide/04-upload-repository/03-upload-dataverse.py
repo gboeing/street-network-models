@@ -1,6 +1,3 @@
-# In[ ]:
-
-
 import hashlib
 import json
 import os
@@ -12,14 +9,8 @@ import osmnx as ox
 import requests
 import xmltodict
 
-# In[ ]:
-
-
 delete_existing_files = True  # only make true on the first run to clear out everything from the draft
 debug_mode = False
-
-
-# In[ ]:
 
 
 # load configs
@@ -38,9 +29,6 @@ attempts_max = 3  # how many times to re-try same file upload after error before
 pause_error = 10  # seconds to pause after an error
 pause_normal = 0  # seconds to pause between uploads
 upload_timeout = 1200  # how long to set the timeout for upload via http post
-
-
-# In[ ]:
 
 
 # define what to upload
@@ -66,11 +54,6 @@ manifests = [
 ]
 
 
-# ## Helper functions
-
-# In[ ]:
-
-
 # what to call the deposited file on the server
 def get_server_filename(file_path):
     # example: /data/wc/staging/gpkg/iraq-IRQ.zip -> iraq-IRQ_gpkg.zip
@@ -79,9 +62,6 @@ def get_server_filename(file_path):
     archive_type = os.path.split(path)[-1]
     archive_name = f"{filename}_{archive_type}{ext}"
     return archive_name
-
-
-# In[ ]:
 
 
 # zip a staged zipped file, open it, and return the buffer
@@ -103,9 +83,6 @@ def get_file_to_upload(file_path):
     return file, md5
 
 
-# In[ ]:
-
-
 # configure the file description and tags that appear on dataverse
 def get_payload_to_upload(file_desc, file_tags, filename):
     # extract country name and add it to description and tags
@@ -117,9 +94,6 @@ def get_payload_to_upload(file_desc, file_tags, filename):
     param_str = json.dumps(params)
     payload = {"jsonData": param_str}
     return payload
-
-
-# In[ ]:
 
 
 # upload a new file to a dataverse dataset
@@ -175,9 +149,6 @@ def upload_new_file(folder, filename, doi, file_desc, file_tags, attempt_count=1
     return response
 
 
-# In[ ]:
-
-
 # get all the filenames that currently exist in the DRAFT dataset
 def get_uploaded_draft_filenames(doi):
     endpoint = f"api/v1/datasets/:persistentId/versions/:draft/files?key={api_key}&persistentId={doi}"
@@ -192,9 +163,6 @@ def get_uploaded_draft_filenames(doi):
         uploaded_filenames = []
 
     return uploaded_filenames
-
-
-# In[ ]:
 
 
 # get all the filenames that currently exist in the latest published dataset
@@ -213,9 +181,6 @@ def get_published_files(doi):
         published_files = {}
 
     return published_files
-
-
-# In[ ]:
 
 
 def delete_dataset_files(doi):
@@ -255,9 +220,6 @@ def delete_dataset_files(doi):
         print(ox.ts(), f"Deleted {i} files in {et} seconds")
 
 
-# In[ ]:
-
-
 # find pre-existing files already uploaded to dataset
 def get_preexisting_files(manifests):
     already_uploaded = {}
@@ -277,17 +239,9 @@ def get_preexisting_files(manifests):
     return already_uploaded, published_files
 
 
-# ## Run the script
-
-# In[ ]:
-
-
 st = time.time()
 print(ox.ts(), "Started process")
 already_uploaded, published_files = get_preexisting_files(manifests)
-
-
-# In[ ]:
 
 
 if delete_existing_files:
@@ -295,9 +249,6 @@ if delete_existing_files:
     for manifest in manifests:
         delete_dataset_files(manifest["doi"])
     already_uploaded, published_files = get_preexisting_files(manifests)
-
-
-# In[ ]:
 
 
 for manifest in manifests:
@@ -319,6 +270,3 @@ for manifest in manifests:
 
 et = time.time()
 print(ox.ts(), f"Script finished in {int(et - st)} seconds.")
-
-
-# In[ ]:
