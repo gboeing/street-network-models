@@ -1,95 +1,52 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import json
 import multiprocessing as mp
-import os
-import osmnx as ox
 import zipfile
+from pathlib import Path
 
-
-# In[ ]:
-
+import osmnx as ox
 
 # load configs
-with open('../config.json') as f:
+with open("./config.json") as f:
     config = json.load(f)
 
-# map input folders to output folders containing zipped country files
-manifest = [{'input': config['models_gpkg_path'],    'output': config['staging_gpkg_path']},
-            {'input': config['models_graphml_path'], 'output': config['staging_graphml_path']},
-            {'input': config['models_nelist_path'],  'output': config['staging_nelist_path']}]
+compression_args = {"compression": zipfile.ZIP_BZIP2, "compresslevel": 9}
 
-if config['cpus'] == 0:
+# map input folders to output folders containing zipped country files
+manifest = [
+    {"input": Path(config["models_gpkg_path"]), "output": Path(config["staging_gpkg_path"])},
+    {"input": Path(config["models_graphml_path"]), "output": Path(config["staging_graphml_path"])},
+    {"input": Path(config["models_nelist_path"]), "output": Path(config["staging_nelist_path"])},
+]
+
+# configure CPUs
+if config["cpus"] == 0:
     cpus = mp.cpu_count()
 else:
-    cpus = config['cpus']
-print(ox.ts(), 'using', cpus, 'CPUs')
-
-# In[ ]:
+    cpus = config["cpus"]
 
 
-# zip a whole directory
-def zip_dir(input_path, output_folder, output_file):
-
-    output_path = os.path.join(output_folder, output_file)
-    if not os.path.exists(output_path):
-        print(ox.ts(), input_path, output_path)
-
-        # create a zip file to contain all the files from the input path
-        zf = zipfile.ZipFile(file=output_path, mode='w', compression=zipfile.ZIP_DEFLATED, compresslevel=9)
-
-        for root, folders, files in os.walk(input_path):
-            for file in sorted(files):
-
-                input_file = os.path.join(root, file)
-                if '/nelist/' in input_file:
-                    # preserve the relative folder structure below country level in zip file
-                    arcname = os.path.join(os.path.split(root)[-1], file)
-                else:
-                    # no subfolders for gpkg or graphml, just files in root
-                    arcname = file
-                zf.write(filename=input_file, arcname=arcname)
-
-        zf.close()
+# zip a folder and its contents
+def zip_folder(input_folder, output_fp, compression_args=compression_args):
+    print(ox.ts(), f"Staging {str(output_fp)!r}", flush=True)
+    pattern = "*/*" if "nelist" in str(input_folder) else "*"
+    with zipfile.ZipFile(output_fp, mode="w", **compression_args) as zf:
+        for input_fp in input_folder.glob(pattern):
+            zf.write(input_fp, arcname=Path(input_fp.parent.stem) / input_fp.name)
 
 
-# In[ ]:
-
-
-print(ox.ts(), f'begin compressing and staging files')
-
-params = []
+# assemble input folders to zip + their destination zip file paths
+args = []
 for item in manifest:
+    output_folder = item["output"]
+    output_folder.mkdir(parents=True, exist_ok=True)
+    for input_folder in item["input"].glob("*"):
+        output_fp = output_folder / (input_folder.stem + ".zip")
+        if not output_fp.is_file():
+            args.append((input_folder, output_fp))
 
-    output_folder = item['output']
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+# multiprocess the queue
+print(ox.ts(), f"Compressing and staging {len(args)} input files using {cpus} CPUs")
+with mp.get_context().Pool(cpus) as pool:
+    pool.starmap_async(zip_folder, args).get()
 
-    for country_folder in sorted(os.listdir(item['input'])):
-        input_path = os.path.join(item['input'], country_folder)
-        output_file = country_folder + '.zip'
-        params.append((input_path, output_folder, output_file))
-
-# create a pool of worker processes
-pool = mp.Pool(cpus)
-
-# map the function/parameters to the worker processes
-sma = pool.starmap_async(zip_dir, params)
-
-# get the results, close the pool, wait for worker processes to all exit
-sma.get()
-pool.close()
-pool.join()
-
-print(ox.ts(), 'finished compressing and staging files')
-
-
-# In[ ]:
-
-
-
-
+print(ox.ts(), f"Finished compressing and staging {len(args)} input files")

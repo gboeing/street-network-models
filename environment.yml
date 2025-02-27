@@ -2,13 +2,16 @@ name: snm
 channels:
   - conda-forge
 dependencies:
-  - geopandas=0.8.*
-  - networkx=2.5.*
-  - numpy=1.19.*
-  - osmnx=1.0.*
-  - pandas=1.2.*
-  - python=3.9.*
-  - requests=2.25.*
-  - scikit-learn=0.24.*
-  - scipy=1.5.*
-  - xmltodict=0.12.*
+  - geopandas=1.0
+  - jupyterlab
+  - networkx=3.4
+  - numpy=2.2
+  - osmnx=2.0
+  - pandas=2.2
+  - pre-commit
+  - python=3.13
+  - python-igraph=0.11
+  - requests=2.32
+  - scikit-learn=1.6
+  - scipy=1.15
+  - xmltodict=0.14
