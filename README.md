@@ -2,13 +2,13 @@
 
 This project uses [OSMnx](https://github.com/gboeing/osmnx) to model and analyze the street networks of every urban area in the world then shares the results (models and measures) in an open data [repository](https://dataverse.harvard.edu/dataverse/global-urban-street-networks) in the Harvard Dataverse.
 
-**Citation info**: Boeing, G. 2025. Updated Street Network Models and Measures for Every Urban Area in the World. Working paper. https://github.com/gboeing/street-network-models
+## Citation
 
-The following sections provide notes on reproducibility.
+Boeing, G. 2025. Updated Street Network Models and Measures for Every Urban Area in the World. Working paper. https://github.com/gboeing/street-network-models
 
 ## Computing environment
 
-Given the resource requirements, it's best to run the workflow in a high-performance computing cluster, but it's feasible to run it on a well-equipped personal computer.
+The following sections provide notes on reproducibility. Given the resource requirements, it's best to run the workflow in a high-performance computing cluster, but it's feasible to run it on a well-equipped personal computer.
 
 System requirements:
 
