@@ -10,7 +10,7 @@ import requests
 from keys import dataverse_api_key as api_key
 
 # only set true on first run to erase everything from the draft
-delete_existing = False
+delete_existing = True
 
 # lets you skip uploading files if this is supposed to be a dry run
 debug_mode = False
@@ -20,7 +20,7 @@ with open("./config.json") as f:
     config = json.load(f)
 
 # configure the dataverse upload
-attempts_max = 3  # how many times to re-try same file upload after error before giving up
+attempts_max = 3  # how many times to retry same file upload after error before giving up
 pause_error = 10  # seconds to pause after an error
 pause_normal = 0  # seconds to pause between uploads
 upload_timeout = 1200  # how long to set the timeout for upload via http post
@@ -29,13 +29,13 @@ upload_timeout = 1200  # how long to set the timeout for upload via http post
 base_url = "https://dataverse.harvard.edu/api/v1/datasets/:persistentId/"
 
 # base URL for working with files via dataverse native API
-file_url = "https://dataverse.harvard.edu/api/files/{}"
+file_url = "https://dataverse.harvard.edu/api/files/{file_id}"
 
 # define what to upload
 manifests = [
     {
         "doi": config["doi_gpkg"],
-        "folder": config["staging_gpkg_path"],  # folder of zip files to upload
+        "folder": config["staging_gpkg_path"],
         "file_desc": "Zip contains GeoPackages of all urban street networks in {}.",
         "file_tags": ["GeoPackage", "Street Network", "Models"],
     },
@@ -57,9 +57,9 @@ manifests = [
 # get all the files that currently exist in the draft or published dataset
 def get_server_files(doi, version):
     endpoint = f"versions/:{version}/files?key={api_key}&persistentId={doi}"
-    response_json = requests.get(urljoin(base_url, endpoint)).json()
+    rj = requests.get(urljoin(base_url, endpoint)).json()
     try:
-        return {file["dataFile"]["filename"]: file["dataFile"]["id"] for file in response_json["data"]}
+        return {file["dataFile"]["filename"]: file["dataFile"]["id"] for file in rj["data"]}
     except KeyError:
         return {}
 
