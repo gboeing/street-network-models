@@ -20,9 +20,7 @@ Runtime environment: create a new [conda](https://conda.io) environment using th
 
 ## Input data
 
-Create a project data root folder with a `inputs` subfolder and place the following unzipped data inside it: *link to inputs.zip*
-
-This project uses the Global Human Settlement Layer urban centers dataset to define the world's urban areas' boundary polygons, specifically, their Urban Centre Database 2025:
+Create a project data root folder with a `inputs` subfolder and place the unzipped [data](https://drive.usercontent.google.com/download?id=1UrHub0mX0LwybpEOKmwHgEvUgrMj0C7y&export=download) in it. This project uses the Global Human Settlement Layer urban centers dataset to define the world's urban areas' boundary polygons, specifically, their Urban Centre Database 2025:
 
 > Mari Rivero, Ines; Melchiorri, Michele; Florio, Pietro; Schiavina, Marcello; Goch, Katarzyna; Politis, Panagiotis; Uhl, Johannes; Pesaresi, Martino; Maffenini, Luca; Sulis, Patrizia; Crippa, Monica; Guizzardi, Diego; Pisoni, Enrico; Belis, Claudio; Jacome Felix Oom, Duarte; Branco, Alfredo; Mwaniki, Dennis; Kochulem, Edwin; Githira, Daniel; Carioli, Alessandra; Ehrlich, Daniele; Tommasi, Pierpaolo; Kemper, Thomas; Dijkstra, Lewis (2024): GHS-UCDB R2024A - GHS Urban Centre Database 2025. European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/1a338be6-7eaf-480c-9664-3a8ade88cbcd PID: http://data.europa.eu/89h/1a338be6-7eaf-480c-9664-3a8ade88cbcd
 
@@ -38,7 +36,7 @@ Load the GHS urban centers dataset, retain useful columns, save as a GeoPackage 
 
 #### 1.2. Download cache
 
-Uses OSMnx to download OSM raw data to a cache for subsequent (multi-)processing.
+Uses OSMnx to download OSM raw data to a cache for subsequent parallel processing.
 
 #### 1.3. Create graphs
 
@@ -135,4 +133,4 @@ Upload to Dataverse using their v1 [native](https://guides.dataverse.org/en/late
       - Global Urban Street Networks Measures
       - Global Urban Street Networks Metadata
 
-Then run the script to upload all the repository files automatically to their respective datasets in the Dataverse (note: if this a dataset *revision*, edit the script to set `delete_existing_files = True` to first clear out all the carried-over files in the draft). Next, *manually* upload the measures and metadata files to their respective datasets in the Dataverse. Finally, visit the Dataverse on the web to publish the draft.
+Then run the script to upload all the repository files automatically to their respective datasets in the Dataverse (note: if this a dataset *revision*, set `delete_existing = True` to first clear out all the carried-over files in the draft). Next, *manually* upload the measures and metadata files to their respective datasets in the Dataverse. Finally, visit the Dataverse on the web to publish the draft.
