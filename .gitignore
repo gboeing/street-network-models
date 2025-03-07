@@ -1,9 +1,6 @@
 *.ipynb
-*keys.json
-*keys.py
-worldwide/indicators/*
-worldwide/05-analysis/*
-usa/*
+keys.py
+paper/analysis
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
