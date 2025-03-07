@@ -145,7 +145,7 @@ def calculate_graph_stats(graphml_path):
     orientation_entropy = ox.bearing.orientation_entropy(ox.bearing.add_edge_bearings(Gu))
 
     # total and clean intersection counts
-    intersection_stats = intersection_counts(ox.project_graph(Gu))
+    intersection_stats = intersection_counts(ox.projection.project_graph(Gu))
 
     # assemble the results
     results = {
