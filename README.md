@@ -14,7 +14,7 @@ System requirements:
 
   - RAM/CPU: minimum of 32gb for single-threaded execution (note: you'll have to edit `config.json` to set the CPU counts to 1). Recommended 128gb + 24 CPU cores for multithreaded execution as parameterized in the config file.
   - Disk space: 2 terabytes.
-  - OS: agnostic, but this workflow has been developed and tested on Linux.
+  - OS: agnostic, but this workflow was developed and tested on Linux.
 
 Runtime environment: create a new [conda](https://conda.io) environment using the `environment.yml` file to install all the necessary packages to run the workflow. You can install a Jupyter kernel in it, if you wish, like `python -m ipykernel install --user --name snm --display-name "Python (snm)"`.
 
@@ -126,7 +126,7 @@ Compress and zip all model files (GeoPackages, GraphML, node/edge lists) into a 
 
 #### 4.3. Upload to Dataverse
 
-Upload to Dataverse using their [native](https://guides.dataverse.org/en/latest/api/native-api.html) and [sword](https://guides.dataverse.org/en/latest/api/sword.html) APIs. First [log in](https://dataverse.harvard.edu) and create an API key if you don't have an active one (they expire annually). If this is a revision to the datasets, create a draft dataset revision on the Dataverse (edit dataset > metadata > change something > save). Otherwise, if this is the first upload ever, create a new Dataverse and new empty datasets within it, structured like:
+Upload to Dataverse using their v1 [native](https://guides.dataverse.org/en/latest/api/native-api.html) API. First [log in](https://dataverse.harvard.edu) and create an API key if you don't have an active one (they expire annually). If this is a revision to existing datasets, create a draft dataset revision on the Dataverse (edit dataset > metadata > change something > save). Otherwise, if this is the first upload ever, create a new Dataverse and new empty datasets within it, structured like:
 
   - Global Urban Street Networks
       - Global Urban Street Networks GeoPackages
@@ -135,8 +135,4 @@ Upload to Dataverse using their [native](https://guides.dataverse.org/en/latest/
       - Global Urban Street Networks Indicators
       - Global Urban Street Networks Metadata
 
-Then run the script to upload all the repository files automatically to their respective datasets in the Dataverse (note, if this a dataset *revision*, edit the script to set `delete_existing_files = True` to first clear out all the carried-over files in the draft).
-
-Next, *manually* upload the indicators and metadata files to their respective datasets in the Dataverse. Finally, visit the Dataverse on the web to publish the draft.
-
-Note that the sword API is just needed to delete files, as this hasn't been implemented in the native API yet as of this writing. The native API handles all the file uploading and metadata (which the sword API only offers limited support for).
+Then run the script to upload all the repository files automatically to their respective datasets in the Dataverse (note: if this a dataset *revision*, edit the script to set `delete_existing_files = True` to first clear out all the carried-over files in the draft). Next, *manually* upload the measures and metadata files to their respective datasets in the Dataverse. Finally, visit the Dataverse on the web to publish the draft.
