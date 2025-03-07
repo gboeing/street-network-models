@@ -13,7 +13,7 @@ delete_existing = False  # only make true on the first run to clear out everythi
 debug_mode = False
 
 # load configs
-with open("../config.json") as f:
+with open("./config.json") as f:
     config = json.load(f)
 
 # configure the dataverse upload
