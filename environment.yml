@@ -13,4 +13,3 @@ dependencies:
   - python-igraph=0.11
   - requests=2.32
   - scipy=1.15
-  - xmltodict=0.14
