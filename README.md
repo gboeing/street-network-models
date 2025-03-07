@@ -1,8 +1,8 @@
-# Urban Street Network Models and Indicators
+# Urban Street Network Models and Measures
 
 This project uses [OSMnx](https://github.com/gboeing/osmnx) to model and analyze the street networks of every urban area in the world then shares the results (models and measures) in an open data [repository](https://dataverse.harvard.edu/dataverse/global-urban-street-networks) in the Harvard Dataverse.
 
-**Citation info**: Boeing, G. 2021. [Street Network Models and Indicators for Every Urban Area in the World](https://doi.org/10.31235/osf.io/f2dqc). *Geographical Analysis*, published online ahead of print. doi:10.31235/osf.io/f2dqc
+**Citation info**: Boeing, G. 2025. Updated Street Network Models and Measures for Every Urban Area in the World. Working paper. https://github.com/gboeing/street-network-models
 
 The following sections provide notes on reproducibility.
 
@@ -132,7 +132,7 @@ Upload to Dataverse using their v1 [native](https://guides.dataverse.org/en/late
       - Global Urban Street Networks GeoPackages
       - Global Urban Street Networks GraphML Files
       - Global Urban Street Networks Node/Edge Lists
-      - Global Urban Street Networks Indicators
+      - Global Urban Street Networks Measures
       - Global Urban Street Networks Metadata
 
 Then run the script to upload all the repository files automatically to their respective datasets in the Dataverse (note: if this a dataset *revision*, edit the script to set `delete_existing_files = True` to first clear out all the carried-over files in the draft). Next, *manually* upload the measures and metadata files to their respective datasets in the Dataverse. Finally, visit the Dataverse on the web to publish the draft.
