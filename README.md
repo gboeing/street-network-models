@@ -20,7 +20,7 @@ Runtime environment: create a new [conda](https://conda.io) environment using th
 
 ## Input data
 
-Create a project data root folder with a `inputs` subfolder and place the unzipped [data](https://drive.usercontent.google.com/download?id=1UrHub0mX0LwybpEOKmwHgEvUgrMj0C7y&export=download) in it. This project uses the Global Human Settlement Layer urban centers dataset to define the world's urban areas' boundary polygons, specifically, their Urban Centre Database 2025:
+Create a project data root folder with a `inputs` subfolder and place the unzipped [input data](https://drive.usercontent.google.com/download?id=1UrHub0mX0LwybpEOKmwHgEvUgrMj0C7y&export=download) in it. This project uses the Global Human Settlement Layer urban centers dataset to define the world's urban areas' boundary polygons, specifically, their Urban Centre Database 2025:
 
 > Mari Rivero, Ines; Melchiorri, Michele; Florio, Pietro; Schiavina, Marcello; Goch, Katarzyna; Politis, Panagiotis; Uhl, Johannes; Pesaresi, Martino; Maffenini, Luca; Sulis, Patrizia; Crippa, Monica; Guizzardi, Diego; Pisoni, Enrico; Belis, Claudio; Jacome Felix Oom, Duarte; Branco, Alfredo; Mwaniki, Dennis; Kochulem, Edwin; Githira, Daniel; Carioli, Alessandra; Ehrlich, Daniele; Tommasi, Pierpaolo; Kemper, Thomas; Dijkstra, Lewis (2024): GHS-UCDB R2024A - GHS Urban Centre Database 2025. European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/1a338be6-7eaf-480c-9664-3a8ade88cbcd PID: http://data.europa.eu/89h/1a338be6-7eaf-480c-9664-3a8ade88cbcd
 
@@ -54,9 +54,9 @@ This project uses three data sources for elevation:
   2. [SRTMGL1](https://www.earthdata.nasa.gov/news/nasa-shuttle-radar-topography-mission-srtm-version-30-global-1-arc-second-data-released-over) GDEM at 30 meter resolution with voids filled (version 3.0 global 1 arc second)
   3. Google Maps Elevation API
 
-We use ASTER and SRTM to attach elevation data to each graph node in each model, then calculate edge grades. Both of these are public, free, open data. It uses Google Maps elevation just as a validation dataset. A previous iteration of this project used to use [CGIAR](https://srtm.csi.cgiar.org)'s post-processed SRTM v4.1, but they only provide 90m resolution SRTM data.
+We use ASTER and SRTM to attach elevation data to each graph node in each model, then calculate edge grades. Both of these are public, free, open data. We just use Google Maps elevation as a validation dataset.
 
-The Google elevation validation technique may not be feasible in the future because they are changing their billing scheme in March 2025. Historically, each billing account gets $200 usage credit free each month. The price per HTTP request was $0.005. Therefore you would get up to 200 / 0.005 = 40,000 free requests each month, within the usage limits of 512 locations per request and 6,000 requests per minute. URLs must be properly encoded to be valid and are limited to 16,384 characters for all web services. With three billing accounts, you could process this entire workflow for free once a month.
+A few notes. A previous iteration of this project used to use [CGIAR](https://srtm.csi.cgiar.org)'s post-processed SRTM v4.1, but they only provide 90m resolution SRTM data. The Google billing scheme is changing in March 2025, rendering Google elevation data collection at this scale possibly infeasible in the future without substantial funding to pay for it. Historically, each billing account gets $200 usage credit free each month. The price per HTTP request was $0.005. Therefore you would get up to 200 / 0.005 = 40,000 free requests each month, within the usage limits of 512 locations per request and 6,000 requests per minute. URLs must be properly encoded to be valid and are limited to 16,384 characters for all web services. With three billing accounts, you could process this entire workflow for free once a month.
 
 #### 2.1. ASTER and SRTM
 
@@ -84,7 +84,7 @@ We want to send node coordinates to the elevation API in batches. But the batche
 
 ##### 2.2.2. Make URLs
 
-Load the CSV file of node clusters and construct an API URL for each, with a key (requires 3 Google API keys to perform this many API calls for free). Note: the Google billing scheme is changing in March 2025, rendering Google elevation data collection at this scale (likely) infeasible in the future without substantial funding to pay for it.
+Load the CSV file of node clusters and construct an API URL for each, with a key (requires 3 Google API keys).
 
 ##### 2.2.3. Download Google elevations
 
@@ -124,7 +124,7 @@ Compress and zip all model files (GeoPackages, GraphML, node/edge lists) into a 
 
 #### 4.3. Upload to Dataverse
 
-Upload to Dataverse using their v1 [native](https://guides.dataverse.org/en/latest/api/native-api.html) API. First [log in](https://dataverse.harvard.edu) and create an API key if you don't have an active one (they expire annually). If this is a revision to existing datasets, create a draft dataset revision on the Dataverse (edit dataset > metadata > change something > save). Otherwise, if this is the first upload ever, create a new Dataverse and new empty datasets within it, structured like:
+Upload to Dataverse using their v1 [Native API](https://guides.dataverse.org/en/latest/api/native-api.html). First [log in](https://dataverse.harvard.edu) and create an API key if you don't have an active one (they expire annually). If this is a revision to existing datasets, create a draft dataset revision on the Dataverse (edit dataset > metadata > change something > save). Otherwise, if this is the first upload ever, create a new Dataverse and new empty datasets within it, structured like:
 
   - Global Urban Street Networks
       - Global Urban Street Networks GeoPackages
