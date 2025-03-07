@@ -1,6 +1,9 @@
 {
   "cpus": 24,
   "cpus_stats": 10,
+  "doi_gpkg": "doi:10.7910/DVN/E5TPDQ",
+  "doi_graphml": "doi:10.7910/DVN/KA5HJ3",
+  "doi_nelist": "doi:10.7910/DVN/DC7U0A",
   "elevation_final_path": "/data/snm/elevation/elevations-final.csv",
   "elevation_google_elevations_path": "/data/snm/elevation/google/elevations-google.csv",
   "elevation_google_urls_path": "/data/snm/elevation/google/urls.csv",
