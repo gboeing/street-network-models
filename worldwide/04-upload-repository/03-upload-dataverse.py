@@ -9,10 +9,11 @@ import osmnx as ox
 import requests
 from keys import dataverse_api_key as api_key
 
-debug_mode = False
-
 # only set true on first run to erase everything from the draft
 delete_existing = False
+
+# lets you skip uploading files if this is supposed to be a dry run
+debug_mode = False
 
 # load configs
 with open("./config.json") as f:
