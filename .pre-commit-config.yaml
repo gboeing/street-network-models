@@ -36,7 +36,7 @@ repos:
             truthy: {check-keys: false}}}
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.9.10
     hooks:
       - id: ruff
         args:
@@ -48,3 +48,14 @@ repos:
         args:
           - --line-length=110
           - --no-cache
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: remove-tabs
+
+  - repo: https://github.com/meliache/pre-commit-chktex
+    rev: v0.2.2
+    hooks:
+      - id: chktex-conda
+        args: [-H, -I]
