@@ -8,14 +8,11 @@ import osmnx as ox
 import pandas as pd
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 # set up save/load folder locations
 graphml_folder = Path(config["models_graphml_path"])  # where to load GraphML
@@ -119,15 +116,15 @@ elist_paths = list(nelist_folder.glob("*/*/edge_list.csv"))
 assert len(graphml_paths) == len(gpkg_paths) == len(nlist_paths) == len(elist_paths)
 
 # verify same countries/cities across all file types
-graphml_names = set(fp.parent.stem + "/" + fp.stem for fp in graphml_paths)
-gpkg_names = set(fp.parent.stem + "/" + fp.stem for fp in gpkg_paths)
-nelist_names = set(fp.parent.stem + "/" + fp.stem for fp in nelist_folder.glob("*/*"))
+graphml_names = {fp.parent.stem + "/" + fp.stem for fp in graphml_paths}
+gpkg_names = {fp.parent.stem + "/" + fp.stem for fp in gpkg_paths}
+nelist_names = {fp.parent.stem + "/" + fp.stem for fp in nelist_folder.glob("*/*")}
 assert graphml_names == gpkg_names == nelist_names
 
 # verify an indicator row exists for every GraphML file
 df = pd.read_csv(config["indicators_path"])
 ucids1 = set(df["uc_id"].astype(str).values)
-ucids2 = set(fp.stem.split("-")[1] for fp in graphml_paths)
+ucids2 = {fp.stem.split("-")[1] for fp in graphml_paths}
 assert ucids1 == ucids2
 
 print(ox.ts(), "Successfully passed all file checks")

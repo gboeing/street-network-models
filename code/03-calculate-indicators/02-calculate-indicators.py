@@ -13,14 +13,11 @@ import osmnx as ox
 import pandas as pd
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus_stats"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus_stats"]
+cpus = mp.cpu_count() if config["cpus_stats"] == 0 else config["cpus_stats"]
 
 graphml_folder = Path(config["models_graphml_path"])  # where to load graphml files
 save_path = Path(config["indicators_street_path"])  # where to save indicator output

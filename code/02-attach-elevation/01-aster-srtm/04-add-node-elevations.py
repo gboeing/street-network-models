@@ -7,15 +7,12 @@ from pathlib import Path
 import networkx as nx
 import osmnx as ox
 
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 ox.settings.cache_folder = config["osmnx_cache_path"]
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 # get the paths of all the ASTER/SRTM rasters
 srtm_files = sorted(Path(config["gdem_srtm_path"]).glob("*.hgt"))

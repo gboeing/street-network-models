@@ -12,7 +12,7 @@ import requests
 from keys import pwd, usr
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configurations

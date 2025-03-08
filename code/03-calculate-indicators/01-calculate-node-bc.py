@@ -13,14 +13,11 @@ import osmnx as ox
 WEIGHT_ATTR = "length"
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 # configure where to find saved graphs and where to save results
 graphml_folder = Path(config["models_graphml_path"])

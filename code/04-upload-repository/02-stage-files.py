@@ -8,7 +8,7 @@ from pathlib import Path
 import osmnx as ox
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 compression_args = {"compression": zipfile.ZIP_BZIP2, "compresslevel": 9}
@@ -21,10 +21,7 @@ manifest = [
 ]
 
 # configure CPUs
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 
 # zip a folder and its contents

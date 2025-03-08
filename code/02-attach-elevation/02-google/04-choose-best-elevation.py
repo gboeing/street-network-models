@@ -10,14 +10,11 @@ import osmnx as ox
 import pandas as pd
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 # dict to convert elev attrs to correct dtype
 elev_attrs = ("elevation_aster", "elevation_srtm")
@@ -51,7 +48,7 @@ def set_elevations(fp, df_elev=df_elev, node_dtypes=node_dtypes):
     nodes.loc[~use_srtm, "elevation"] = nodes.loc[~use_srtm, "elevation_aster"]
 
     # ensure all elevations are non-null
-    assert pd.notnull(nodes["elevation"]).all()
+    assert pd.notna(nodes["elevation"]).all()
     nodes["elevation"] = nodes["elevation"].astype(int)
 
     # add elevation to graph nodes, calculate edge grades, then save to disk
@@ -62,7 +59,7 @@ def set_elevations(fp, df_elev=df_elev, node_dtypes=node_dtypes):
 
 
 # multiprocess the queue
-args = list((fp,) for fp in Path(config["models_graphml_path"]).glob("*/*.graphml"))  # [-100:]
+args = [(fp,) for fp in Path(config["models_graphml_path"]).glob("*/*.graphml")]  # [-100:]
 msg = f"Setting node elevations for {len(args):,} GraphML files using {cpus} CPUs"
 print(ox.ts(), msg)
 with mp.get_context().Pool(cpus) as pool:

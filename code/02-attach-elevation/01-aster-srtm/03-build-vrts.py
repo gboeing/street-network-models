@@ -5,7 +5,7 @@ from pathlib import Path
 
 import osmnx as ox
 
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 ox.settings.cache_folder = config["osmnx_cache_path"]
 aster_path = Path(config["gdem_aster_path"])

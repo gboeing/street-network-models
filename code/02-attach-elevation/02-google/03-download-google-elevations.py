@@ -11,14 +11,11 @@ import pandas as pd
 import requests
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 ox.settings.use_cache = True
 ox.settings.log_console = False
@@ -52,13 +49,12 @@ def get_elevations(nodes, url, pause=0):
     results = response_json["results"]
     if results is None:
         return None
-    else:
-        df = pd.DataFrame(results, index=literal_eval(nodes))
-        if "elevation" not in df.columns:
-            cache_filepath = ox._http._resolve_cache_filepath(url)
-            print(ox.ts(), f"No elevation results in {str(cache_filepath)!r}")
-            return None
-        return df[["elevation", "resolution"]].round(2)
+    df = pd.DataFrame(results, index=literal_eval(nodes))
+    if "elevation" not in df.columns:
+        cache_filepath = ox._http._resolve_cache_filepath(url)
+        print(ox.ts(), f"No elevation results in {str(cache_filepath)!r}")
+        return None
+    return df[["elevation", "resolution"]].round(2)
 
 
 # load the URLs and count how many we already have responses cached for

@@ -4,6 +4,7 @@ import json
 import logging as lg
 import multiprocessing as mp
 import time
+from pathlib import Path
 
 import geopandas as gpd
 import osmnx as ox
@@ -14,7 +15,7 @@ print(ox.ts(), "OSMnx version", ox.__version__)
 cpus = 3
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure OSMnx
@@ -56,7 +57,6 @@ def download_data(name, geometry):
         print(name, e)
 
 
-# ucs = ucs.tail(100).sample(len(ucs))
 names = ucs["country_iso"] + "-" + ucs["GC_UCN_MAI_2025"] + "-" + ucs["ID_UC_G0"].astype(str)
 args = zip(names, ucs["geometry"])
 

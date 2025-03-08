@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import json
+from pathlib import Path
 
 import osmnx as ox
 import pandas as pd
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 ind_path = config["indicators_path"]  # indicators data (repo subset)
@@ -148,7 +149,7 @@ print(ox.ts(), f"Saved all indicator metadata to {str(ind_all_meta_path)!r}")
 
 # drop fields that should not go in our repo then save
 repo_cols = set(pd.read_csv(ind_path).columns)
-keep = [k for k in desc.keys() if k in repo_cols]
+keep = [k for k in desc if k in repo_cols]
 meta = meta.loc[keep].reset_index().rename(columns={"index": "indicator"})
 meta.to_csv(ind_meta_path, index=False, encoding="utf-8")
 print(ox.ts(), f"Saved repo indicator metadata to {str(ind_meta_path)!r}")
