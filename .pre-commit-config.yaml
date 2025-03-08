@@ -42,7 +42,8 @@ repos:
         args:
           - --fix
           - --line-length=110
-          - --select=A,B,E,F,I,UP,W
+          - --select=A,B,C,E,EM,ERA,F,I,NPY,PD,PTH,SIM,UP,W
+          - --ignore=T201,PD901
           - --no-cache
       - id: ruff-format
         args:
