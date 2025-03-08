@@ -28,7 +28,7 @@ jobs:
         uses: mamba-org/setup-micromamba@v2
         with:
           cache-environment: true
-          environment-file: environment.yml
+          environment-file: ./code/environment.yml
           post-cleanup: none
 
       - name: Cache pre-commit
