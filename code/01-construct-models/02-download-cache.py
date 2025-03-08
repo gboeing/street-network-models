@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import logging as lg
 import multiprocessing as mp
