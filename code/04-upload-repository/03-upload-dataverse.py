@@ -74,7 +74,9 @@ def get_preexisting_files(manifests):
         doi = manifest["doi"]
         draft_files[doi] = get_server_files(doi, version="draft")
         published_files[doi] = get_server_files(doi, version="latest-published")
-        msg = f"Files in {doi}: {len(published_files[doi])} published, {len(draft_files[doi])} draft."
+        msg = (
+            f"Files in {doi}: {len(published_files[doi])} published, {len(draft_files[doi])} draft."
+        )
         print(ox.ts(), msg)
     return draft_files, published_files
 
@@ -138,7 +140,8 @@ def upload_file(fp, target_filename, manifest, attempt_count=1):
             msg = f"Checksums do not match: {checksum} and {remote_checksum}"
             raise Exception(msg)
 
-        print(ox.ts(), f"Response {response.status_code} in {elapsed:,.1f} seconds, checksums match")
+        msg = f"Response {response.status_code} in {elapsed:,.1f} seconds, checksums match"
+        print(ox.ts(), msg)
         time.sleep(pause_normal)
 
     except Exception as e:

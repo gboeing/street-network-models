@@ -42,7 +42,17 @@ def save_graph(graphml_path, gpkg_path, nodes_path, edges_path, node_dtypes=node
     nodes, edges = ox.convert.graph_to_gdfs(G, node_geometry=False, fill_edge_geometry=False)
 
     # nodes: round floats and organize columns
-    node_cols = ["osmid", "x", "y", "elevation", "elevation_aster", "elevation_srtm", "bc", "ref", "highway"]
+    node_cols = [
+        "osmid",
+        "x",
+        "y",
+        "elevation",
+        "elevation_aster",
+        "elevation_srtm",
+        "bc",
+        "ref",
+        "highway",
+    ]
     nodes = nodes.reset_index().reindex(columns=node_cols)
 
     # edges: round floats and organize columns

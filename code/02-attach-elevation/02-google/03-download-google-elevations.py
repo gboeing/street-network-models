@@ -41,7 +41,7 @@ def get_elevations(nodes, url, pause=0):
             response_json = response.json()
             ox._http._save_to_cache(url, response_json, response.ok)
         except Exception as e:
-            msg = f"Server responded {response.status_code}, {response.reason}, {response.text}, {url}"
+            msg = f"Response: {response.status_code}, {response.reason}, {response.text}, {url}"
             print(ox.ts(), msg, e)
             return None
 

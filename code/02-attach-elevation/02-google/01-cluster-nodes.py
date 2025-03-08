@@ -26,7 +26,9 @@ save_folder = Path(config["elevation_nodeclusters_path"])
 
 # return graph nodes' x-y coordinates
 def get_graph_nodes(fp):
-    return ox.convert.graph_to_gdfs(ox.io.load_graphml(fp), edges=False, node_geometry=False)[["x", "y"]]
+    return ox.convert.graph_to_gdfs(ox.io.load_graphml(fp), edges=False, node_geometry=False)[
+        ["x", "y"]
+    ]
 
 
 # get an iterator of points around the perimeter of nodes' coordinates

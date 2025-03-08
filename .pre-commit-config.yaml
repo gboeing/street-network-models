@@ -41,13 +41,13 @@ repos:
       - id: ruff
         args:
           - --fix
-          - --line-length=110
+          - --line-length=100
           - --select=A,B,C,E,EM,ERA,F,I,NPY,PD,PTH,SIM,UP,W
           - --ignore=T201,PD901
           - --no-cache
       - id: ruff-format
         args:
-          - --line-length=110
+          - --line-length=100
           - --no-cache
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks

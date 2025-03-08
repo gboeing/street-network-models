@@ -60,7 +60,10 @@ desc["length"] = {"description": "Length along the edge (meters)", "type": "floa
 desc["grade"] = {"description": "Edge grade (rise over run)", "type": "float"}
 desc["grade_abs"] = {"description": "Absolute value of edge grade", "type": "float"}
 desc["oneway"] = {"description": "Whether edge part of a one-way street", "type": "boolean"}
-desc["reversed"] = {"description": "Whether edge runs opposite direction of OSM way", "type": "boolean"}
+desc["reversed"] = {
+    "description": "Whether edge runs opposite direction of OSM way",
+    "type": "boolean",
+}
 desc["other attributes"] = {"description": "As defined in OSM documentation", "type": ""}
 
 # save edges metadata to disk
@@ -97,8 +100,12 @@ desc["grade_mean"] = "Mean absolute street grade (incline)"
 desc["grade_median"] = "Median absolute street grade (incline)"
 desc["hdi"] = "Human development index at subnational level (GHS)"
 desc["intersect_count"] = "Count of (undirected) edge intersections"
-desc["intersect_count_clean"] = "Count of street intersections (merged within 10 meters geometrically)"
-desc["intersect_count_clean_topo"] = "Count of street intersections (merged within 10 meters topologically)"
+desc["intersect_count_clean"] = (
+    "Count of street intersections (merged within 10 meters geometrically)"
+)
+desc["intersect_count_clean_topo"] = (
+    "Count of street intersections (merged within 10 meters topologically)"
+)
 desc["k_avg"] = "Average node degree (undirected)"
 desc["koppen_geiger"] = "Köppen-Geiger classification of majority of surface (GHS)"
 desc["land_use_efficiency"] = "Land use efficiency 1990-2015 (GHS)"
@@ -108,7 +115,9 @@ desc["length_total"] = "Total street length (undirected edges), meters"
 desc["node_count"] = "Count of nodes"
 desc["orientation_entropy"] = "Entropy of street network bearings"
 desc["pagerank_max"] = "The maximum PageRank value of any node"
-desc["pm25_concentration"] = "Population-weighted average PM2.5 concentrations, micrograms/meter^3 (GHS)"
+desc["pm25_concentration"] = (
+    "Population-weighted average PM2.5 concentrations, micrograms/meter^3 (GHS)"
+)
 desc["pop_greenness"] = "Land consumption rate / population growth rate (GHS)"
 desc["prop_4way"] = "Proportion of nodes that represent 4-way street intersections"
 desc["prop_3way"] = "Proportion of nodes that represent 3-way street intersections"
@@ -137,7 +146,9 @@ ind_all = ind_all.reindex(columns=meta.index).dropna()
 # add data type of each field
 dtypes = ind_all.dtypes.astype(str).replace({"object": "string"}).str.replace("64", "")
 dtypes.name = "type"
-meta = meta.merge(right=dtypes, left_index=True, right_index=True).reindex(columns=["type", "description"])
+meta = meta.merge(right=dtypes, left_index=True, right_index=True).reindex(
+    columns=["type", "description"]
+)
 
 # make sure all the indicators are present in the metadata
 assert (meta.index == ind_all.columns).all()
