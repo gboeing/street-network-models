@@ -77,7 +77,7 @@ cols = [
     "geometry",  # urban center geometry
 ]
 
-# only retain urban centers with at least 1 sq km of built-up area
+# only retain urban centers with >1 sq km of built-up area
 # drops 943 out of 11422 rows (8.3%)
 sq_km = 1e6  # meters
 ucs = ucs[ucs["GH_BUS_TOT_2025"] > sq_km]
