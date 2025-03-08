@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import multiprocessing as mp
 from itertools import batched
@@ -12,17 +14,16 @@ precision = 5
 coords_per_request = 512
 requests_per_key = 39000
 chars_per_url = 16384
-url_template = "https://maps.googleapis.com/maps/api/elevation/json?locations={locations}&key={{key}}"
+url_template = (
+    "https://maps.googleapis.com/maps/api/elevation/json?locations={locations}&key={{key}}"
+)
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 # set up the args
 filepaths = sorted(Path(config["elevation_nodeclusters_path"]).glob("*.csv"))

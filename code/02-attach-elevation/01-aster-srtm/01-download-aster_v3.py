@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+
 import json
 import multiprocessing as mp
 from pathlib import Path
-from zipfile import ZipFile
 
 import osmnx as ox
 import pandas as pd
@@ -11,13 +12,13 @@ import requests
 from keys import pwd, usr
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configurations
 cpus = 4
-urls_path = config["gdem_srtm_urls_path"]
-dl_path = Path(config["gdem_srtm_path"])
+urls_path = config["gdem_aster_urls_path"]
+dl_path = Path(config["gdem_aster_path"])
 dl_path.mkdir(parents=True, exist_ok=True)
 
 
@@ -32,31 +33,26 @@ def download(url, usr=usr, pwd=pwd, dl_path=dl_path):
             filepath = dl_path / filename
             with filepath.open(mode="wb") as f:
                 f.write(response.content)
-
-            with ZipFile(filepath, "r") as z:
-                z.extractall(dl_path)
-            filepath.unlink()
-
         else:
             print(response.status_code, response.text)
 
 
-# get all the URLs
+# get all the URLs pointing at dem tif files
 urls = pd.read_csv(urls_path, header=None).iloc[:, 0].sort_values()
-print(ox.ts(), f"There are {len(urls):,} total SRTM URLs")
+urls = urls[urls.str.endswith("_dem.tif")]
+print(ox.ts(), f"There are {len(urls):,} total ASTER URLs")
 
 # how many files have already been downloaded?
-existing = {fp.name.split(".")[0] for fp in dl_path.glob("*.hgt")}
+existing = {path.name for path in dl_path.glob("*.tif")}
 print(ox.ts(), f"There are {len(existing):,} files already downloaded")
 
 # how many files are remaining to download?
-tiles = (Path(url).name.split(".")[0] for url in urls)
-remaining = [url for url, tile in zip(urls, tiles) if tile not in existing]
-print(ox.ts(), f"Downloading {len(remaining):,} URLs with {cpus} CPUs")
+urls = [url for url in urls if Path(url).name not in existing]
+print(ox.ts(), f"Downloading {len(urls):,} URLs with {cpus} CPUs")
 
 # multiprocess the queue
-if len(remaining) > 0:
-    args = ((url,) for url in remaining)
+if len(urls) > 0:
+    args = ((url,) for url in urls)
     with mp.get_context().Pool(cpus) as pool:
         _ = pool.starmap_async(download, args).get()
 

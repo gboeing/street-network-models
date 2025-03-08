@@ -1,11 +1,14 @@
+#!/usr/bin/env python
+
 import json
+from pathlib import Path
 
 import geopandas as gpd
 import osmnx as ox
 import pandas as pd
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 uc_gpkg_path = config["uc_gpkg_path"]  # prepped urban centers dataset

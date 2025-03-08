@@ -1,13 +1,16 @@
+#!/usr/bin/env python
+
 import json
 import re
 import unicodedata
+from pathlib import Path
 
 import geopandas as gpd
 import osmnx as ox
 import pandas as pd
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 fp = config["uc_input_path"]
@@ -17,7 +20,7 @@ print(ox.ts(), msg)
 # load all GHS urban centers dataset gpkg together into 1 gdf
 col_on = "ID_UC_G0"
 suffixes = ("", "_DROP")
-layers = [layer for layer in gpd.list_layers(fp)["name"]]
+layers = list(gpd.list_layers(fp)["name"])
 ucs = gpd.read_file(fp, layer=layers[0])
 for layer in layers[1:]:
     ucs = ucs.merge(
@@ -87,7 +90,7 @@ ucs[cols_int] = ucs[cols_int].astype(int)
 # add country ISO column from lookup table
 iso = pd.read_csv(config["iso_codes_path"]).set_index("name")["alpha3"].to_dict()
 ucs["country_iso"] = ucs["GC_CNT_GAD_2025"].replace(iso)
-assert pd.notnull(ucs["country_iso"]).all()
+assert pd.notna(ucs["country_iso"]).all()
 
 
 regex = re.compile("[^0-9a-zA-Z]+")

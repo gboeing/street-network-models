@@ -36,15 +36,27 @@ repos:
             truthy: {check-keys: false}}}
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.9.10
     hooks:
       - id: ruff
         args:
           - --fix
-          - --line-length=110
-          - --select=A,B,E,F,I,UP,W
+          - --line-length=100
+          - --select=A,B,C,E,EM,ERA,F,I,NPY,PD,PTH,SIM,UP,W
+          - --ignore=T201,PD901
           - --no-cache
       - id: ruff-format
         args:
-          - --line-length=110
+          - --line-length=100
           - --no-cache
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: remove-tabs
+
+  - repo: https://github.com/meliache/pre-commit-chktex
+    rev: v0.2.2
+    hooks:
+      - id: chktex-conda
+        args: [-H, -I]

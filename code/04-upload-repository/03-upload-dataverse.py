@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import time
 import zipfile
@@ -10,13 +12,13 @@ import requests
 from keys import dataverse_api_key as api_key
 
 # only set true on first run to erase everything from the draft
-delete_existing = True
+delete_existing = False
 
 # lets you skip uploading files if this is supposed to be a dry run
 debug_mode = False
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure the dataverse upload
@@ -72,7 +74,9 @@ def get_preexisting_files(manifests):
         doi = manifest["doi"]
         draft_files[doi] = get_server_files(doi, version="draft")
         published_files[doi] = get_server_files(doi, version="latest-published")
-        msg = f"Files in {doi}: {len(published_files[doi])} published, {len(draft_files[doi])} draft."
+        msg = (
+            f"Files in {doi}: {len(published_files[doi])} published, {len(draft_files[doi])} draft."
+        )
         print(ox.ts(), msg)
     return draft_files, published_files
 
@@ -133,9 +137,11 @@ def upload_file(fp, target_filename, manifest, attempt_count=1):
         # verify the checksum calculated by the server matches our own
         remote_checksum = response.json()["data"]["files"][0]["dataFile"]["md5"]
         if checksum != remote_checksum:
-            raise Exception(f"Checksums do not match: {checksum} and {remote_checksum}")
+            msg = f"Checksums do not match: {checksum} and {remote_checksum}"
+            raise Exception(msg)
 
-        print(ox.ts(), f"Response {response.status_code} in {elapsed:,.1f} seconds, checksums match")
+        msg = f"Response {response.status_code} in {elapsed:,.1f} seconds, checksums match"
+        print(ox.ts(), msg)
         time.sleep(pause_normal)
 
     except Exception as e:

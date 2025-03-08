@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import itertools
 import json
 import math
@@ -12,14 +14,11 @@ from scipy.spatial import cKDTree
 coords_per_request = 512
 
 # load configs
-with open("./config.json") as f:
+with Path("./config.json").open() as f:
     config = json.load(f)
 
 # configure multiprocessing
-if config["cpus"] == 0:
-    cpus = mp.cpu_count()
-else:
-    cpus = config["cpus"]
+cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 graphml_folder = Path(config["models_graphml_path"])
 save_folder = Path(config["elevation_nodeclusters_path"])
@@ -27,7 +26,9 @@ save_folder = Path(config["elevation_nodeclusters_path"])
 
 # return graph nodes' x-y coordinates
 def get_graph_nodes(fp):
-    return ox.convert.graph_to_gdfs(ox.io.load_graphml(fp), edges=False, node_geometry=False)[["x", "y"]]
+    return ox.convert.graph_to_gdfs(ox.io.load_graphml(fp), edges=False, node_geometry=False)[
+        ["x", "y"]
+    ]
 
 
 # get an iterator of points around the perimeter of nodes' coordinates
@@ -87,7 +88,7 @@ def cluster_nodes(fp):
 
 
 filepaths = sorted(graphml_folder.glob("*/*.graphml"))
-args = list((fp,) for fp in filepaths if not (save_folder / (fp.stem + ".csv")).is_file())
+args = [(fp,) for fp in filepaths if not (save_folder / (fp.stem + ".csv")).is_file()]
 print(ox.ts(), f"Clustering nodes from {len(args):,} remaining GraphML files")
 
 with mp.get_context().Pool(cpus) as pool:
