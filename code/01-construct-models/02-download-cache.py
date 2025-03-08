@@ -39,7 +39,7 @@ msg = f"Loaded urban centers data with shape {ucs.shape} from {uc_gpkg_path!r}"
 print(ox.ts(), msg)
 
 
-def download_data(name, geometry):
+def download_data(name, geometry) -> None:
     try:
         ox.graph_from_polygon(
             polygon=geometry,

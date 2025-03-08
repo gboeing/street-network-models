@@ -35,10 +35,10 @@ def set_elevations(fp, df_elev=df_elev, node_dtypes=node_dtypes):
 
     # calculate differences in ASTER, SRTM, and Google elevation values
     nodes["elev_diff_aster_google"] = (nodes["elevation_aster"] - nodes["elevation_google"]).fillna(
-        np.inf
+        np.inf,
     )
     nodes["elev_diff_srtm_google"] = (nodes["elevation_srtm"] - nodes["elevation_google"]).fillna(
-        np.inf
+        np.inf,
     )
 
     # in each row identify if SRTM or ASTER has smaller absolute difference from Google's value

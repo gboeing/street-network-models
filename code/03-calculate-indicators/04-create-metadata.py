@@ -147,7 +147,7 @@ ind_all = ind_all.reindex(columns=meta.index).dropna()
 dtypes = ind_all.dtypes.astype(str).replace({"object": "string"}).str.replace("64", "")
 dtypes.name = "type"
 meta = meta.merge(right=dtypes, left_index=True, right_index=True).reindex(
-    columns=["type", "description"]
+    columns=["type", "description"],
 )
 
 # make sure all the indicators are present in the metadata

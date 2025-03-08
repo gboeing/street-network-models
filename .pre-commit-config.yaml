@@ -42,8 +42,8 @@ repos:
         args:
           - --fix
           - --line-length=100
-          - --select=A,B,C,E,EM,ERA,F,I,NPY,PD,PTH,SIM,UP,W
-          - --ignore=T201,PD901
+          - --select=ALL
+          - --ignore=ANN,BLE001,D,T201,N803,N806,PD901,S,SLF001,TRY002,TRY301
           - --no-cache
       - id: ruff-format
         args:

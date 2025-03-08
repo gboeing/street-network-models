@@ -74,7 +74,7 @@ def get_clusters(nodes):
 
 
 # load graph, cluster nodes, and save to disk
-def cluster_nodes(fp):
+def cluster_nodes(fp) -> None:
     nodes = get_graph_nodes(fp)
     clusters = get_clusters(nodes)
     for count, cluster in enumerate(clusters):

@@ -41,7 +41,7 @@ def convert_igraph(G_nx, weight_attr):
     return G_ig
 
 
-def calculate_bc(fp, save_path, weight_attr=WEIGHT_ATTR):
+def calculate_bc(fp, save_path, weight_attr=WEIGHT_ATTR) -> None:
     print(ox.ts(), f"{str(fp)!r}")
 
     # load graphml, convert to igraph, calculate bc, and normalize values

@@ -82,7 +82,7 @@ def get_preexisting_files(manifests):
 
 
 # delete all the existing (carried-over) files in the draft datasets
-def delete_draft_files(already_uploaded):
+def delete_draft_files(already_uploaded) -> None:
     file_ids = [f for d in already_uploaded.values() for f in d.values()]
     print(ox.ts(), f"Deleting {len(file_ids)} draft files...")
     headers = {"X-Dataverse-key": api_key}
@@ -115,7 +115,7 @@ def get_payload_to_upload(fp, manifest):
 
 
 # upload a new file to a dataverse dataset
-def upload_file(fp, target_filename, manifest, attempt_count=1):
+def upload_file(fp, target_filename, manifest, attempt_count=1) -> None:
     print(ox.ts(), f"Uploading {str(fp)!r} to {manifest['doi']!r}")
     if debug_mode:
         return

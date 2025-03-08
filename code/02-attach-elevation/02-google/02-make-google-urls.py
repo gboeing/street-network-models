@@ -39,7 +39,7 @@ df = df[~df.index.duplicated()]
 print(ox.ts(), f"There are {len(df):,} unique nodes")
 
 
-def url_add_locations(label, cluster):
+def url_add_locations(_, cluster):
     assert len(cluster) <= coords_per_request
     strings = (f"{y:.{precision}f},{x:.{precision}f}" for y, x in zip(cluster["y"], cluster["x"]))
     locations = "|".join(strings)

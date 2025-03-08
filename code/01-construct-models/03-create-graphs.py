@@ -38,7 +38,7 @@ msg = f"Loaded urban centers data with shape {ucs.shape} from {uc_gpkg_path!r}"
 print(ox.ts(), msg)
 
 
-def get_graph(uc, root):
+def get_graph(uc, root) -> None:
     try:
         country_folder = f"{uc['GC_CNT_GAD_2025']}-{uc['country_iso']}"
         uc_filename = f"{uc['GC_UCN_MAI_2025']}-{uc['ID_UC_G0']}.graphml"
@@ -53,7 +53,8 @@ def get_graph(uc, root):
             )
 
             # don't save graphs if they have fewer than 3 nodes
-            if len(G) > 2:
+            min_nodes = 3
+            if len(G) >= min_nodes:
                 ox.save_graphml(G, filepath=filepath)
                 print(ox.ts(), f"Saved {filepath}", flush=True)
 
