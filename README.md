@@ -43,8 +43,8 @@ Uses OSMnx to download OSM raw data to a cache for subsequent parallel processin
 Use cached OSM raw data to construct a MultiDiGraph of each street network. Can be done in parallel with multiprocessing by changing `cpus` config setting. Saves to disk as GraphML file. Parameterized to get only drivable streets, retain all, simplify, and truncate by edge. Does this for every urban center's polygon boundary if it meets the following conditions:
 
   - is marked with a "high" quality control score
-  - has >= 1 km2 built-up area
-  - includes at least 3 nodes
+  - has >1 km2 built-up area
+  - includes ≥3 nodes
 
 ### 2. Attach elevation
 
