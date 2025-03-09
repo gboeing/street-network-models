@@ -43,7 +43,7 @@ repos:
           - --fix
           - --line-length=100
           - --select=ALL
-          - --ignore=ANN,BLE001,D,T201,N803,N806,PD901,S,SLF001,TRY002,TRY301
+          - --ignore=ANN,BLE001,D,N803,N806,PD901,S,SLF001,T201,TRY002,TRY301
           - --no-cache
       - id: ruff-format
         args:
