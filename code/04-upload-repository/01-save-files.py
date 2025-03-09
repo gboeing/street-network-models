@@ -31,7 +31,7 @@ def to_int(value):
 node_dtypes = {"bc": float, "elevation_aster": to_int, "elevation_srtm": to_int}
 
 
-def save_graph(graphml_path, gpkg_path, nodes_path, edges_path, node_dtypes=node_dtypes):
+def save_graph(graphml_path, gpkg_path, nodes_path, edges_path, node_dtypes=node_dtypes) -> None:
     print(ox.ts(), f"Saving {str(graphml_path)!r}", flush=True)
 
     # load GraphML file and save as GeoPackage to disk

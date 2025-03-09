@@ -25,7 +25,7 @@ cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 
 # zip a folder and its contents
-def zip_folder(input_folder, output_fp, compression_args=compression_args):
+def zip_folder(input_folder, output_fp, compression_args=compression_args) -> None:
     print(ox.ts(), f"Staging {str(output_fp)!r}", flush=True)
     pattern = "*/*" if "nelist" in str(input_folder) else "*"
     with zipfile.ZipFile(output_fp, mode="w", **compression_args) as zf:

@@ -22,7 +22,7 @@ dl_path = Path(config["gdem_aster_path"])
 dl_path.mkdir(parents=True, exist_ok=True)
 
 
-def download(url, usr=usr, pwd=pwd, dl_path=dl_path):
+def download(url, usr=usr, pwd=pwd, dl_path=dl_path) -> None:
     with requests.Session() as session:
         filename = Path(url).name
         session.trust_env = False

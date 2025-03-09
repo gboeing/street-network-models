@@ -34,7 +34,9 @@ drop = [c for c in ucs.columns if "_DROP" in c]
 ucs = ucs.drop(columns=drop)
 
 # quality control checks
-assert ucs.index.is_unique and ucs.columns.is_unique and ucs.crs is not None
+assert ucs.index.is_unique
+assert ucs.columns.is_unique
+assert ucs.crs is not None
 
 # project to OSMnx's default CRS
 ucs = ucs.to_crs(ox.settings.default_crs)
@@ -75,9 +77,10 @@ cols = [
     "geometry",  # urban center geometry
 ]
 
-# only retain urban centers with at least 1 sq km of built-up area
+# only retain urban centers with >1 sq km of built-up area
 # drops 943 out of 11422 rows (8.3%)
-ucs = ucs[ucs["GH_BUS_TOT_2025"] > 1e6]
+sq_km = 1e6  # meters
+ucs = ucs[ucs["GH_BUS_TOT_2025"] > sq_km]
 
 # only retain urban centers with a "high" quality control score
 # drops 127 out of 10479 rows (1.2%)
@@ -102,7 +105,8 @@ def clean_str(s, regex=regex):
     # null, empty string, or 1+ whitespaces then rename it to "unnamed"
     try:
         norm = unicodedata.normalize("NFKD", s).encode("ascii", errors="ignore").decode()
-        assert norm != "" and set(norm) != {" "}
+        assert norm != ""
+        assert set(norm) != {" "}
     except (AssertionError, TypeError):
         norm = "Unnamed"
     return regex.sub("_", norm).lower().strip("_")

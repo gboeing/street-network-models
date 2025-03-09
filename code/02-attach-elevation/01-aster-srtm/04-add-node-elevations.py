@@ -20,7 +20,7 @@ aster_files = sorted(Path(config["gdem_aster_path"]).glob("*.tif"))
 attr_rasters = [("elevation_aster", aster_files), ("elevation_srtm", srtm_files)]
 
 
-def process_graph(filepath, attr_rasters=attr_rasters):
+def process_graph(filepath, attr_rasters=attr_rasters) -> None:
     G = ox.io.load_graphml(filepath)
     for attr, rasters in attr_rasters:
         # if not all graph nodes have this attr, then add elevation from

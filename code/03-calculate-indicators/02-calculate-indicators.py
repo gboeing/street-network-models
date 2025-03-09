@@ -84,7 +84,7 @@ def gini(x):
     return (n + 1 - 2 * np.sum(cumx) / cumx[-1]) / n
 
 
-def save_results(results, save_path):
+def save_results(results, save_path) -> None:
     save_path.parent.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(results)
     if save_path.is_file():
