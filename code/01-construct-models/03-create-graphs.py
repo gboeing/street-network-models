@@ -73,7 +73,7 @@ args = ((uc[cols].to_dict(), root) for _, uc in ucs.iterrows())
 print(ox.ts(), f"Begin creating {len(ucs):,} graphs using {cpus} CPUs")
 start_time = time.time()
 with mp.get_context().Pool(cpus) as pool:
-    _ = pool.starmap_async(get_graph, args).get()
+    pool.starmap_async(get_graph, args).get()
 
 elapsed = time.time() - start_time
 msg = f"Finished creating {len(ucs):,} graphs in {elapsed:,.0f} seconds"

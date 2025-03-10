@@ -92,4 +92,4 @@ args = [(fp,) for fp in filepaths if not (save_folder / (fp.stem + ".csv")).is_f
 print(ox.ts(), f"Clustering nodes from {len(args):,} remaining GraphML files")
 
 with mp.get_context().Pool(cpus) as pool:
-    _ = pool.starmap_async(cluster_nodes, args).get()
+    pool.starmap_async(cluster_nodes, args).get()

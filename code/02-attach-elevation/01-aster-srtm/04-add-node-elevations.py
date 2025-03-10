@@ -42,5 +42,5 @@ args = ((fp,) for fp in filepaths)
 # multiprocess the queue
 print(ox.ts(), f"Adding elevation to {len(filepaths):,} graphs with {cpus} CPUs")
 with mp.get_context().Pool(cpus) as pool:
-    _ = pool.starmap_async(process_graph, args).get()
+    pool.starmap_async(process_graph, args).get()
 print(ox.ts(), f"Finished adding elevation to {len(filepaths):,} graphs")
