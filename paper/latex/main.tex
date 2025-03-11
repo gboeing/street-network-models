@@ -2,13 +2,7 @@
 % LaTeX Template
 % Author: Geoff Boeing
 % Web: https://geoffboeing.com/
-% Repo: https://github.com/gboeing/latex-template
-% Some considerations:
-% - use pdflatex instead of xelatex/lualatex for compatibility with arxiv and publishers
-% - use natbib/bibtex instead of biblatex/biber for compatibility with arxiv and publishers
-% - avoid system fonts, instead use self-contained ebgaramond/tgheros font packages
-% - avoid importing other packages unless truly necessary (it rarely is)
-% - compile often, check log for any warnings/errors, and resolve them promptly when they arise
+% Repo: https://github.com/gboeing/street-network-models
 
 \RequirePackage[l2tabu,orthodox]{nag} % warn if using any obsolete or outdated commands
 \documentclass[12pt,letterpaper]{article} % document style
@@ -46,10 +40,10 @@
 
 \newcommand{\myname}{Geoff Boeing}
 \newcommand{\myemail}{boeing@usc.edu}
-\newcommand{\myaffiliation}{Department of Urban Planning and Spatial Analysis\\Sol Price School of Public Policy\\University of Southern California}
-\newcommand{\paperdate}{April 2024}
-\newcommand{\papertitle}{This Is My Paper Title}
-\newcommand{\papercitation}{Boeing, G. 2024. \papertitle. Under review at \textit{Journal Name}.}
+\newcommand{\myaffiliation}{Department of Urban Planning and Spatial Analysis\\University of Southern California}
+\newcommand{\paperdate}{April 2025}
+\newcommand{\papertitle}{Updated Street Network Models and Measures for Every Urban Area in the World}
+\newcommand{\papercitation}{Boeing, G. 2025. \papertitle. Under review at \textit{Journal Name}.}
 \newcommand{\paperkeywords}{Urban Planning, Transportation, Data Science}
 
 % location of figure files, via graphicx package
@@ -88,10 +82,10 @@
 
 \begin{document}
 
-\title{\papertitle\footnote{{Preprint of: \papercitation}}}
-\author[]{\myname\footnote{Correspondence: \href{mailto:\myemail}{\myemail}}}
-\affil[]{\myaffiliation}
-\date{\paperdate}
+\title{\papertitle}%\footnote{{Preprint of: \papercitation}}}
+\author[]{Redacted for review}%\myname\footnote{Correspondence: \href{mailto:\myemail}{\myemail}}}
+\affil[]{Redacted for review}%\myaffiliation}
+\date{}%\paperdate}
 
 \maketitle
 
@@ -103,73 +97,43 @@ Nunc efficitur dui non elementum tincidunt. Sed eget ultricies dui, nec congue m
 
 \section{Introduction}
 
-Lorem ipsum\endnote{This is my note.} dolor sit amet, \textit{consectetur} adipiscing elit. Mauris fermentum sapien at libero finibus, lacinia tincidunt mi varius. Vestibulum \enquote{eget pretium} urna. Phasellus consectetur sem eu egestas scelerisque. Etiam tempor porttitor nulla, et rhoncus dui. Praesent iaculis sollicitudin augue et luctus. Quisque congue odio a suscipit sodales. Nullam mattis, ligula at vulputate lacinia, est nisi faucibus felis, ac gravida orci ligula sit amet nulla. Sed commodo magna semper interdum facilisis. Proin porttitor tortor a purus convallis malesuada \citep{boeing_off_2021}. Ut tempus eleifend eros, lacinia lobortis urna rhoncus ut. Donec in sapien tincidunt, consectetur velit ut, posuere nibh. Cras finibus imperdiet sem nec placerat. Donec efficitur metus eu sapien semper elementum. Nullam eros dui, rhoncus lacinia libero ac, pretium pellentesque justo. In a laoreet mauris, ac sollicitudin erat. Phasellus mattis tincidunt diam id sagittis.
+Context: tbd
 
-Nullam consequat ex lectus. Aliquam sagittis lacus quis dui tincidunt, eget accumsan dolor dictum. Duis vel ultricies sem. Aliquam dapibus tellus consequat, ornare diam vitae, dapibus dui. Maecenas blandit posuere augue quis ornare. Fusce posuere tortor fringilla lacus viverra, a iaculis quam vehicula. Aenean convallis tellus ut leo egestas, ac consequat nisi efficitur.
+Problem: old repository. New GHSL + years of OSM additions. New urban boundaries, hundreds of new GHSL variables. Node bc.
 
-\section{Background}
-
-Nunc porttitor pretium eleifend \citep{boarnet_travel_2001}. In hendrerit dolor leo, at rutrum erat finibus ac. Aliquam id nisi ipsum. In tristique, neque nec condimentum consectetur, neque nisi imperdiet nibh, at pellentesque urna quam non leo. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut sed consequat nunc, sit amet iaculis augue. Mauris in blandit erat, non dapibus nulla. Duis condimentum pretium felis, vel commodo justo luctus non. Integer consectetur, ipsum consectetur tristique pharetra, ligula purus ultricies diam, et lacinia odio sapien et arcu. Morbi vel semper urna, in consectetur massa. Mauris rutrum sem nec tortor tincidunt porta. Mauris maximus vehicula nisi, id cursus leo laoreet ac. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas a lacus vel nisl volutpat vehicula.
+Solution: Using street data from OpenStreetMap and boundaries from the Global Human Settlement Layer (GHSL), this study models and analyzes the street networks of every urban area in the world. This comprises 180 million OpenStreetMap nodes and 360 million OpenStreetMap edges across 10,351 urban areas in 189 countries. This article describes the open data repository containing these models and measures, as well as the open-source software repository containing the code to generate them.
 
 \section{Methods}
 
-In hendrerit dolor leo, at rutrum erat finibus ac. Aliquam id nisi ipsum. In tristique, neque nec condimentum consectetur, neque nisi imperdiet nibh, at pellentesque urna quam non leo. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut sed consequat nunc, sit amet iaculis augue. Mauris in blandit erat, non dapibus nulla. Duis condimentum pretium felis, vel commodo justo luctus non. Integer consectetur, ipsum consectetur tristique pharetra, ligula purus ultricies diam, et lacinia odio sapien et arcu. Morbi vel semper urna, in consectetur massa. Mauris rutrum sem nec tortor tincidunt porta. Mauris maximus vehicula nisi, id cursus leo laoreet ac. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas a lacus vel nisl volutpat vehicula.
+Here we describe the workflow that generates the models and calculates the indicators.
 
-\subsection{Data}
+\subsection{Urban Boundaries}
 
-Nunc efficitur dui non elementum tincidunt. Sed eget ultricies dui, nec congue massa. Fusce at faucibus arcu, a dapibus leo. Donec congue viverra lorem, et viverra massa pellentesque eu. Mauris dictum efficitur lectus, nec tempus velit viverra at. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In tristique urna purus, a viverra sapien vehicula at. Donec id lectus dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Ut viverra leo ac velit aliquam, id pellentesque est maximus. Proin laoreet aliquet ex vel semper.
+The workflow begins by extracting the boundary polygons of each urban area in the world from the GHSL Urban Centre Database 2025, which contains 11,422 entities. Describe it.
 
-\begin{equation}
-    \label{eq:my_equation}
-    D_t = \frac{R_t + I_t - O_t}{A_t}
-\end{equation}
+We retain urban areas with >1 km\textsuperscript{2} built-up area, a \enquote{high} GHSL quality control score, and >3 OpenStreetMap network nodes, resulting in 10,351 urban areas. Defend why.
 
-Integer congue sollicitudin elit, ut tincidunt odio tincidunt quis. Duis eu mi sed massa pellentesque efficitur. Suspendisse fringilla dolor sed erat finibus consequat. Integer in metus vel odio hendrerit efficitur. Nulla sed orci nec mi commodo ultricies mattis non tortor.
+\subsection{Network Modeling}
 
-\subsection{Analysis}
+We use OSMnx to download OpenStreetMap raw data and construct a spatial graph model of the drivable street network within each urban area. We parameterize OSMnx to use its \enquote{drive} network type, retain all graph components, and simplify the graph. Describe edge simplification.
 
-Quisque faucibus varius elit eu accumsan. Vivamus sit amet arcu at nibh auctor vulputate. Suspendisse dolor est, lacinia quis justo sodales, varius rhoncus nisi. Nulla maximus urna pulvinar dui pellentesque ultrices. Sed tincidunt consectetur massa, tincidunt sollicitudin odio eleifend in. Cras ornare ante non semper efficitur. Morbi vel maximus nisi, ac luctus sapien. Etiam augue nisi, aliquam vel quam quis, dignissim dignissim orci. Phasellus ultricies purus in ante scelerisque pulvinar. Morbi faucibus fringilla congue. Aenean accumsan est sit amet dolor maximus, vel posuere quam semper. Sed vehicula cursus gravida. Pellentesque auctor in elit ut laoreet. Proin iaculis condimentum turpis. Aenean egestas semper laoreet. Ut ornare dui quis lacus feugiat, eget posuere odio rutrum.
 
-\section{Findings}
 
-Integer urna mauris, varius at vestibulum id, elementum id purus. Vestibulum tincidunt, odio at tempor tempor, ex eros iaculis quam, aliquet blandit felis lectus sit amet diam. Morbi vel sapien at mi rhoncus molestie. Sed nec laoreet tortor. Nunc id dui fringilla, laoreet velit quis, venenatis ipsum. Phasellus semper mauris in diam ultrices, vitae tincidunt nisi euismod. Pellentesque quis lacinia lectus. Morbi nec dolor a ipsum bibendum viverra in nec lacus. Proin maximus sem vel bibendum dapibus. Quisque fringilla at ex at aliquet. Sed est quam, porta ac elit et, consectetur vestibulum leo. Integer nec quam a metus eleifend tempus. Vestibulum non varius arcu.
+\subsection{Elevation}
 
-\subsection{Finding One}
+\subsection{Indicator Calculation}
 
- In posuere egestas lacus a hendrerit. Sed semper interdum lacus, non imperdiet ipsum faucibus nec Figure~\ref{fig:my_figure}. Cras a mollis purus. Morbi ut ornare neque. Praesent gravida velit nec lectus faucibus, nec vestibulum mi pharetra. Nulla molestie ultrices nisi, eget posuere velit feugiat vel. Duis fringilla felis libero, eget cursus felis consequat et. Donec sodales elit diam, ut faucibus lacus hendrerit et. Curabitur auctor finibus nisl, in rutrum purus imperdiet sit amet.
+\subsection{Repository Upload}
 
-\begin{figure*}[tbp]
-    \centering
-    \includegraphics[width=0.95\textwidth]{example.png}
-    \caption{This is the caption of my figure.}\label{fig:my_figure}
-\end{figure*}
+\section{Results}
 
-Pellentesque molestie pretium neque, eget laoreet ex. Curabitur quis lectus id neque tincidunt ullamcorper nec vel odio. Pellentesque tempus metus quam, non pellentesque nibh tempus et. Ut leo massa, iaculis nec lectus et, porttitor molestie eros. Vivamus eleifend dignissim purus, a egestas nisi iaculis ut. Maecenas interdum eros in orci aliquet pulvinar at nec lorem. Mauris et quam vel urna iaculis vulputate et sit amet velit. Curabitur massa nibh, viverra ornare gravida in, sodales nec ex. Fusce fermentum elementum nisi, ac porta magna tincidunt quis. Sed congue nunc eget mauris consequat gravida. Suspendisse fermentum risus sit amet auctor dapibus. Ut quam ex, finibus non imperdiet sit amet, semper ac erat. Vivamus convallis eget sapien ac pulvinar. Pellentesque ut pharetra lorem.
+\subsection{Code Repository}
 
-\subsection{Finding Two}
+These methods are fully reproducible by running the workflow in the code repository.
 
-Proin eu ligula ut sem lacinia ullamcorper Table~\ref{tab:my_table}. Vivamus ullamcorper massa arcu, sed tincidunt dui dictum et. Vivamus finibus libero in leo semper, at fermentum ligula porta. Aliquam molestie ligula eget volutpat iaculis. Nam porttitor elit tortor, eget euismod risus mollis et. Mauris sit amet iaculis odio, eu fringilla leo. Phasellus pharetra vitae velit et faucibus. Mauris orci tellus, dignissim et quam eget, tincidunt pretium libero. In eu vehicula orci, vitae dignissim neque. In suscipit, risus eget lobortis dapibus, orci libero hendrerit lectus, a vulputate dui sem quis est. Suspendisse id tortor consequat ligula vehicula porta.
+\subsection{Data Repository}
 
-\begin{table*}[tbp]
-    \centering
-    \caption{This is the caption of my table.}\label{tab:my_table}
-    \begin{tabular}{rrrr}
-        \toprule
-        Residential Pop &  Daytime Pop &  Land Area (km\textsuperscript{2}) &  Daytime Density \\
-        \midrule
-        1783  & 70728 & 0.556 & 127198 \\
-        6172  & 42635 & 0.446 &  95652 \\
-        2734  &  8006 & 0.092 &  86882 \\
-        1500  &  4850 & 0.057 &  85743 \\
-        4307  & 19051 & 0.240 &  79424 \\
-        4233  & 22416 & 0.346 &  64768 \\
-        3499  & 13051 & 0.214 &  60971 \\
-        11502 & 92865 & 1.670 &  55617 \\
-        3821  &  3319 & 0.061 &  54162 \\
-        3073  &  4829 & 0.093 &  52122 \\
-        \bottomrule
-    \end{tabular}
-\end{table*}
+x
 
 \section{Conclusion}
 
