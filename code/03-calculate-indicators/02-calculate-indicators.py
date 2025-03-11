@@ -126,7 +126,7 @@ def calculate_graph_stats(graphml_path):
     spn = ox.stats.streets_per_node_proportions(Gu)
     prop_4way = spn.get(4, 0)
     prop_3way = spn.get(3, 0)
-    prop_deadend = spn.get(0, 0)
+    prop_deadend = spn.get(1, 0)
 
     # betweenness centrality stats
     bc = list(nx.get_node_attributes(Gu, "bc").values())

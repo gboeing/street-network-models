@@ -54,7 +54,7 @@ print(ox.ts(), f"Downloading {len(urls):,} URLs with {cpus} CPUs")
 if len(urls) > 0:
     args = ((url,) for url in urls)
     with mp.get_context().Pool(cpus) as pool:
-        _ = pool.starmap_async(download, args).get()
+        pool.starmap_async(download, args).get()
 
 file_count = len(list(dl_path.glob("*")))
 msg = f"Finished: {file_count:,} files in {str(dl_path)!r}"
