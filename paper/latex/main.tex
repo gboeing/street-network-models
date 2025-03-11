@@ -117,13 +117,28 @@ We retain urban areas with >1 km\textsuperscript{2} built-up area, a \enquote{hi
 
 We use OSMnx to download OpenStreetMap raw data and construct a spatial graph model of the drivable street network within each urban area. We parameterize OSMnx to use its \enquote{drive} network type, retain all graph components, and simplify the graph. Describe edge simplification.
 
-
+Each graph is saved as a GraphML file.
 
 \subsection{Elevation}
 
+We attach elevation, in meters above sea level, to each node in each urban area's graph use two global digital elevation models (GDEMs): the Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) v3 GDEM, and the Shuttle Radar Topography Mission (SRTM) version 3.0 GDEM with voids filled.
+Both are 1 arcsecond (approximately 30-meter) resolution.
+
+First we download all the GDEM rasters from ASTER (45,824 tiles) and SRTM (14,297 tiles) from NASA EarthData. Then we build a virtual raster for each. Then we use OSMnx to load each GraphML file and attach the elevation from ASTER and SRTM to each graph node, then resave the file with these node attributes.
+
+As each node has both an ASTER and an SRTM elevation value, we choose one to use as the \enquote{official} node elevation by comparing each to a \enquote{tie-breaker} value from Google. To do so, we download each node's elevation from the Google Maps Elevation API, then choose between ASTER and SRTM based on whichever is closer to Google's value. Then we calculate edge grades and resave each GraphML file.
+
 \subsection{Indicator Calculation}
 
-\subsection{Repository Upload}
+We calculate various street network measures. These include. Add table?
+
+However, the most important contribution here is the calculation of node betweenness centrality for every node in every graph. Explain why. Describe max BC and Gini.
+
+Create metadata files for the graphs' node and edge attributes and all of the indicators.
+
+\subsection{Data Repository Preparation}
+
+We convert each GraphML file to a GeoPackage and node/edge list comma-separated value (CSV) files. Explain why. Then we perform a set of file verification checks. The we compress and zip all model files (GeoPackages, GraphML, and node/edge lists) at the country level for upload to the Harvard Dataverse. We upload them using the Dataverse native API v1.
 
 \section{Results}
 
@@ -133,7 +148,12 @@ These methods are fully reproducible by running the workflow in the code reposit
 
 \subsection{Data Repository}
 
-x
+There are 5 datasets nested within the top-level Dataverse data repository.
+- Global Urban Street Networks GeoPackages
+- Global Urban Street Networks GraphML Files
+- Global Urban Street Networks Node/Edge Lists
+- Global Urban Street Networks Measures
+- Global Urban Street Networks Metadata
 
 \section{Conclusion}
 
