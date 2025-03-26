@@ -34,6 +34,7 @@
 \usepackage{rotating} % rotate wide tables or figures on a page to make them landscape
 \usepackage{titlesec} % custom section and subsection heading
 \usepackage{url} % make nice line-breakble urls
+\usepackage{easyReview}
 
 % print only the month and year when using \today
 \newdateformat{monthyeardate}{\monthname[\THEMONTH] \THEYEAR}
@@ -42,7 +43,7 @@
 \newcommand{\myemail}{boeing@usc.edu}
 \newcommand{\myaffiliation}{Department of Urban Planning and Spatial Analysis\\University of Southern California}
 \newcommand{\paperdate}{April 2025}
-\newcommand{\papertitle}{Updated Street Network Models and Measures for Every Urban Area in the World}
+\newcommand{\papertitle}{Urban Science Beyond Samples: Updated Street Network Models and Measures for Every Urban Area in the World}
 \newcommand{\papercitation}{Boeing, G. 2025. \papertitle. Under review at \textit{Journal Name}.}
 \newcommand{\paperkeywords}{Urban Planning, Transportation, Data Science}
 
@@ -90,78 +91,136 @@
 \maketitle
 
 \begin{abstract}
-Nunc efficitur dui non elementum tincidunt. Sed eget ultricies dui, nec congue massa. Fusce at faucibus arcu, a dapibus leo. Donec congue viverra lorem, et viverra massa pellentesque eu. Mauris dictum efficitur lectus, nec tempus velit viverra at. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In tristique urna purus, a viverra sapien vehicula at. Donec id lectus dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Ut viverra leo ac velit aliquam, id pellentesque est maximus. Proin laoreet aliquet ex vel semper. Integer congue sollicitudin elit, ut tincidunt odio tincidunt quis. Duis eu mi sed massa pellentesque efficitur.
+In this era of rapid urbanization and change, planners need up-to-date, global, and consistent street network models and indicators to measure network resilience and performance, model accessibility, and target local interventions to improve quality of life. This article presents updated street network models and indicators for every urban area in the world. It uses 2025 urban area boundaries from the Global Human Settlement Layer, allowing users to join these data with hundreds of other urban attributes. Its workflow ingests 180 million OpenStreetMap nodes and 360 million OpenStreetMap edges across 10,351 urban areas in 189 countries. The code, models, and indicators are publicly available for others to download and reuse. This helps enable worldwide urban street network science without samples, and local analyses in under-resourced regions where models and indicators are otherwise less-accessible.
 \vspace{1cm}
 \end{abstract}
 
 
 \section{Introduction}
 
-Context: tbd
+Street networks structure the urban fabric and the flow of people and goods through cities \citep{barrington-leigh_global_2020}. Scholars and practitioners commonly use spatial graphs to model street networks to understand or predict many phenomena, including traffic dynamics, accessibility to daily living needs, and the resilience and sustainability of urban forms \citep{barthelemy_spatial_2022}. These spatial graphs are defined by both their topology (connections and configuration) and geometry (positions, lengths, areas, and angles) \citep{fischer_spatial_2014}. Various topological and geometric indicators exist throughout the literature to measure important street network characteristics: node degrees reveal streets' connectedness, weighted betweenness centralities identify relatively important parts of the network, circuity suggests its efficiency or lack thereof, etc. These indicators then inform downstream urban analytics to target planning interventions or benchmark and monitor cities' progress toward stated sustainability goals.
 
-Problem: old repository. New GHSL + years of OSM additions. New urban boundaries, hundreds of new GHSL variables. Node bc.
+Up-to-date, global, consistent urban street network models and indicators are needed more today than ever before as planners face intertwined sustainability and public health crises in cities around the world \citep{giles-corti_creating_2022}. Meanwhile, urban science seeks to expand beyond the limits of traditional sampling to build universal theory and better understand understudied regions, such as the Global South. Yet traditional data sources and methods present headwinds to these offers. Data on urban streets are often digitized inconsistently from place to place, making analyses particularly difficult in under-resourced regions and thwarting apples-to-apples global comparisons \citep{liu_generalized_2022}. Popular data sources such as OpenStreetMap offer reasonably high quality data around the world, but do not package it in graph-theoretic form nor provide measures or indicators \citep{boeing_modeling_2025}. Tools such as OSMnx fill this gap, but still require coding knowledge to conduct the analysis and potentially require extensive computational resources for someone trying to conduct global urban science.
 
-Solution: Using street data from OpenStreetMap and boundaries from the Global Human Settlement Layer (GHSL), this study models and analyzes the street networks of every urban area in the world. This comprises 180 million OpenStreetMap nodes and 360 million OpenStreetMap edges across 10,351 urban areas in 189 countries. This article describes the open data repository containing these models and measures, as well as the open-source software repository containing the code to generate them.
+This article presents a resource a fill this gap by offering street network models and measures worldwide for scholars and practitioners to easily reuse without reinventing the wheel. Using street data from OpenStreetMap and boundaries from the Global Human Settlement Layer (GHSL), this study models and analyzes the street networks of every urban area in the world. This workflow processes 180 million OpenStreetMap nodes and 360 million OpenStreetMap edges across 10,351 urban areas in 189 countries. This article describes this open data repository of street network models and indicators, as well as the open-source software repository containing the code to generate them. In the next section, it describes our reproducible methods. Then it discusses the work's lineage, present contribution, and future. Finally it concludes with suggestions for getting started with these data and code.
 
-\section{Methods}
+\section{Reproducible Methods}
 
-Here we describe the workflow that generates the models and calculates the indicators.
+The following computational workflow, written in the Python programming language, generates these models and calculates these indicators.
 
 \subsection{Urban Boundaries}
 
-The workflow begins by extracting the boundary polygons of each urban area in the world from the GHSL Urban Centre Database 2025, which contains 11,422 entities. Describe it.
-
-We retain urban areas with >1 km\textsuperscript{2} built-up area, a \enquote{high} GHSL quality control score, and >3 OpenStreetMap network nodes, resulting in 10,351 urban areas. Defend why.
+The workflow begins by extracting the boundary polygons of each urban area in the world from the 2025 GHSL UCD, which contains 11,422 entities.\ \citet{mari_rivero_urban_2025} describes this input dataset in detail, but to summarize, the GHSL integrates a vast array of census data, remote sensing data, and volunteered geographic information to delineate the world's urban areas and attach corresponding attribute data. We retain urban areas with >1 km\textsuperscript{2} built-up area and a \enquote{high} GHSL quality control score, resulting in 10,351 urban areas. This provides us with basic filtering to ensure we are modeling true urbanized areas rather than false positives or tiny villages.
 
 \subsection{Network Modeling}
 
-We use OSMnx to download OpenStreetMap raw data and construct a spatial graph model of the drivable street network within each urban area. We parameterize OSMnx to use its \enquote{drive} network type, retain all graph components, and simplify the graph. Describe edge simplification.
-
-Each graph is saved as a GraphML file.
+We use OSMnx to download OpenStreetMap raw data and construct a spatial graph model of the drivable street network within each urban area. These models are nonplanar directed multigraphs with possible self-loops. They have node/edge attribute data (from OpenStreetMap) plus geographic coordinates and geometries \citep{boeing_modeling_2025}. We parameterize OSMnx to use its \enquote{drive} network type, retain all graph components, and run its edge simplification algorithm \citep{boeing_topological_2025}. Each urban area's graph is saved as a GraphML file, a standard graph serialization format.
 
 \subsection{Elevation}
 
 We attach elevation, in meters above sea level, to each node in each urban area's graph use two global digital elevation models (GDEMs): the Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) v3 GDEM, and the Shuttle Radar Topography Mission (SRTM) version 3.0 GDEM with voids filled.
-Both are 1 arcsecond (approximately 30-meter) resolution.
+Both are 1 arcsecond (approximately 30-meter) resolution. First we download all the GDEM rasters for ASTER (45,824 tiles) and SRTM (14,297 tiles) from NASA EarthData. Next we build a virtual raster for each source. Then we use OSMnx to load each GraphML file and attach the elevation from ASTER and SRTM to each graph node.
 
-First we download all the GDEM rasters from ASTER (45,824 tiles) and SRTM (14,297 tiles) from NASA EarthData. Then we build a virtual raster for each. Then we use OSMnx to load each GraphML file and attach the elevation from ASTER and SRTM to each graph node, then resave the file with these node attributes.
+As each node has both an ASTER and an SRTM elevation value, we choose one to use as the \enquote{official} node elevation by comparing each to a \enquote{tie-breaker} value from Google. To do so, we download each node's elevation from the Google Maps Elevation API, then choose between ASTER and SRTM based on whichever is nearer to Google's value. Then we calculate edge grades and re-save each GraphML file with these node/edge attributes.
 
-As each node has both an ASTER and an SRTM elevation value, we choose one to use as the \enquote{official} node elevation by comparing each to a \enquote{tie-breaker} value from Google. To do so, we download each node's elevation from the Google Maps Elevation API, then choose between ASTER and SRTM based on whichever is closer to Google's value. Then we calculate edge grades and resave each GraphML file.
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \caption{The indicators dataset contents. Those carried over from GHSL are noted.}\label{tab:indicators}
+    \begin{tabular}{p{3.8cm} p{1.2cm} p{7.6cm}}
+        \toprule
+        Variable                      & Type    & Description \\
+        \midrule
+        area\_km2 & integer & Area within urban center boundary polygon, km2 (GHSL) \\
+        bc\_gini & decimal & Gini coefficient of normalized distance-weighted node betweenness centralities \\
+        bc\_max & decimal & Max normalized distance-weighted node betweenness centrality \\
+        built\_up\_area\_m2 & integer & Built-up surface area, square meters (GHSL) \\
+        cc\_avg\_dir & decimal & Average clustering coefficient (unweighted/directed) \\
+        cc\_avg\_undir & decimal & Average clustering coefficient (unweighted/undirected) \\
+        cc\_wt\_avg\_dir & decimal & Average clustering coefficient (weighted/directed) \\
+        cc\_wt\_avg\_undir & decimal & Average clustering coefficient (weighted/undirected) \\
+        circuity & decimal & Ratio of street lengths to straightline distances \\
+        core\_city & string & Urban center core city name \\
+        country & string & Primary country name \\
+        country\_iso & string & Primary country ISO 3166--1 alpha--3 code \\
+        elev\_iqr & decimal & Interquartile range of node elevations, meters \\
+        elev\_mean & decimal & Mean node elevation, meters \\
+        elev\_median & decimal & Median node elevation, meters \\
+        elev\_range & decimal & Range of node elevations, meters \\
+        elev\_std & decimal & Standard deviation of node elevations, meters \\
+        grade\_mean & decimal & Mean absolute street grade (incline) \\
+        grade\_median & decimal & Median absolute street grade (incline) \\
+        intersect\_count & integer & Count of (undirected) edge intersections \\
+        intersect\_count\_clean & integer & Count of street intersections (merged within 10 meters geometrically) \\
+        intersect\_count\_clean\_topo & integer & Count of street intersections (merged within 10 meters topologically) \\
+        k\_avg & decimal & Average node degree (undirected) \\
+        length\_mean & decimal & Mean street segment length (undirected edges), meters \\
+        length\_median & decimal & Median street segment length (undirected edges), meters \\
+        length\_total & decimal & Total street length (undirected edges), meters \\
+        node\_count & integer & Count of nodes \\
+        orientation\_entropy & decimal & Entropy of street network bearings \\
+        pagerank\_max & decimal & The maximum PageRank value of any node \\
+        prop\_4way & decimal & Proportion of nodes that represent 4-way street intersections \\
+        prop\_3way & decimal & Proportion of nodes that represent 3-way street intersections \\
+        prop\_deadend & decimal & Proportion of nodes that represent dead-ends \\
+        resident\_pop & integer & Total resident population (GHSL) \\
+        self\_loop\_proportion & decimal & Proportion of edges that are self-loops \\
+        straightness & decimal & Inverse of circuity \\
+        street\_segment\_count & integer & Count of streets (undirected edges) \\
+        uc\_id & integer & Urban center unique ID (GHSL) \\
+        uc\_names & string & List of city names within this urban center (GHSL) \\
+        world\_region & string & UN SDG geographic region \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsection{Indicator Calculation}
 
-We calculate various street network measures. These include. Add table?
-
-However, the most important contribution here is the calculation of node betweenness centrality for every node in every graph. Explain why. Describe max BC and Gini.
-
-Create metadata files for the graphs' node and edge attributes and all of the indicators.
+We calculate various street network measures listed in Table~\ref{tab:indicators}.\ \alert{These include. Add table?} However, the most important contribution here is the calculation of node betweenness centrality for every node in every graph.\ \alert{Explain why.} Describe max BC and Gini. Create metadata files for the graphs' node and edge attributes and all of the indicators.
 
 \subsection{Data Repository Preparation}
 
-We convert each GraphML file to a GeoPackage and node/edge list comma-separated value (CSV) files. Explain why. Then we perform a set of file verification checks. The we compress and zip all model files (GeoPackages, GraphML, and node/edge lists) at the country level for upload to the Harvard Dataverse. We upload them using the Dataverse native API v1.
+We convert each GraphML file to a GeoPackage and node/edge list files. The former allows users to work with these spatial networks in any GIS software. The latter provides a minimal, lightweight, highly compressible version of the models. Then we perform a series of file verification checks. Finally we compress and zip all model files (GeoPackages, GraphML, and node/edge lists) at the country level for upload to the Harvard Dataverse.
 
-\section{Results}
+\section{Code and Data Products}
 
 \subsection{Code Repository}
 
-These methods are fully reproducible by running the workflow in the code repository.
+The preceding methods are fully reproducible by running the modeling and analytics workflow, which is publicly available in the source code repository\endnote{Code repository: https://github.com/gboeing/street-network-models} on Github. A well-equipped personal computer can execute this workflow, but given the resource requirements it may be better (and faster) to run it in a high-performance computing cluster, where available. The code is written in Python and is operating system-agnostic. The input data and dependencies required to run it are documented in the repository's readme file.
 
 \subsection{Data Repository}
 
-There are 5 datasets nested within the top-level Dataverse data repository.
-- Global Urban Street Networks GeoPackages
-- Global Urban Street Networks GraphML Files
-- Global Urban Street Networks Node/Edge Lists
-- Global Urban Street Networks Measures
-- Global Urban Street Networks Metadata
+The data repository comprises five datasets nested within a top-level Dataverse\endnote{Top-level Dataverse: https://dataverse.harvard.edu/dataverse/global-urban-street-networks} data repository:
 
-\section{Conclusion}
+\begin{itemize}
+    \item Global Urban Street Networks GeoPackages\endnote{Global Urban Street Networks GeoPackages: https://doi.org/10.7910/DVN/E5TPDQ}
+    \item Global Urban Street Networks GraphML files\endnote{Global Urban Street Networks GraphML files: https://doi.org/10.7910/DVN/KA5HJ3}
+    \item Global Urban Street Networks Node/Edge lists\endnote{Global Urban Street Networks Node/Edge lists: https://doi.org/10.7910/DVN/DC7U0A}
+    \item Global Urban Street Networks Indicators \endnote{Global Urban Street Networks Indicators: https://doi.org/10.7910/DVN/ZTFPTB}
+    \item Global Urban Street Networks Metadata \endnote{Global Urban Street Networks Metadata: https://doi.org/10.7910/DVN/WMPPF9}
+\end{itemize}
 
-Aliquam pulvinar, augue id blandit scelerisque, orci nulla consequat purus, quis accumsan lectus leo eu tortor. Donec tempor dolor vel dui lobortis viverra. Nam at orci quam. Ut ut efficitur tellus, in rhoncus odio. Duis egestas tortor lectus, eget sollicitudin eros ornare ac. Suspendisse faucibus mollis convallis. Mauris id risus blandit, suscipit dolor nec, posuere quam. Nulla facilisi. Cras nec hendrerit arcu, a mattis nisl. Nam dictum libero non lectus suscipit, vitae feugiat enim rutrum. Curabitur et leo dolor. Morbi dolor tellus, cursus posuere hendrerit et, convallis id nunc. Phasellus ultrices ante nulla, id rhoncus turpis efficitur in.
+The model files are zipped at the country level, and each urban area is identified by its name and UCD ID.\ The latter allows users to join them to GHSL attribute data.
 
-\section*{Acknowledgments}
+\section{Discussion: Lineage and Contribution}
 
-The author wishes to thank the following people for their comments and support.
+In an era of rapid urbanization, scholars and practitioners need models and indicators that keep up with the pace of transformational urban change. This project builds on prior work initially conducted in 2019--2020 that generated an initial version of the data repository. That preliminary version was based on the 2015 version of GHSL Urban Centre Database (UCD) and 2020 OpenStreetMap data. The new version takes advantage of years of advances to use 2025 GHSL UCD and 2025 OpenStreetMap data to make six main contributions.
+
+First, it includes over 1,400 more urban areas and 11 more countries than the earlier version. This entails significantly more worldwide coverage in an era of rapid urban expansion.
+
+Second, these new models incorporate 10 years of recent urbanization in their updated urban area boundaries and 5 years of new community additions to OpenStreetMap. As such, this workflow's modeling included approximately 20 million more street network nodes and 40 million more edges than the earlier version. The new urban boundaries allow users to link these street network models and measures to hundreds of new, up-to-date GHSL attributes on urban climate, land use, economic conditions, etc.
+
+Third, it adds new indicators to the repository---most consequentially the betweenness centrality of every node in every urban area's street network, which is extremely time and resource intensive to calculate, yet unlocks powerful analyses of network structure and resilience.
+
+Fourth, it uses finer-grained SRTM data (30m instead of the previous 90m resolution) for more precise elevation attribute values.
+
+Fifth, from a \textit{code product} perspective, the workflow's code base has been wholly refactored and rewritten from the ground-up to reduce its code complexity, memory use, and runtime. This makes the workflow more maintainable, sustainable, and easier to re-run in the future to periodically update the data repository.
+
+Sixth, and finally, these models and indicators themselves unlock other researchers' work. This project provides a global dataset to conduct both worldwide urban street network science beyond samples as well as local analyses particularly in less-resourced regions where such models and indicators are most needed.
+
+\section{Getting Started}
+
+To get started, users may download models or indicators directly from the aforementioned Dataverse or access the source code and documentation at the aforementioned Github source code repository.
 
 % print the footnotes as endnotes, if any exist
 \IfFileExists{\jobname.ent}{\theendnotes}{}
