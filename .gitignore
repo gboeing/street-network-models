@@ -2,6 +2,7 @@
 *.ipynb
 keys.py
 paper/analysis
+paper/submission
 *.pdf
 
 # Byte-compiled / optimized / DLL files
