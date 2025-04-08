@@ -18,7 +18,7 @@ cpus = mp.cpu_count() if config["cpus"] == 0 else config["cpus"]
 
 # dict to convert elev attrs to correct dtype
 elev_attrs = ("elevation_aster", "elevation_srtm")
-node_dtypes = {attr: float for attr in elev_attrs}
+node_dtypes = dict.fromkeys(elev_attrs, float)
 
 # load google elevation data for lookup
 fp = config["elevation_google_elevations_path"]
