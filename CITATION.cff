@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "Urban Street Network Models and Measures"
+authors:
+- family-names: "Boeing"
+  given-names: "Geoff"
+  orcid: "https://orcid.org/0000-0003-1851-6411"
+  website: "https://geoffboeing.com"
+url: "https://github.com/gboeing/street-network-models"
+repository-code: "https://github.com/gboeing/street-network-models"
+preferred-citation:
+  type: report
+  title: "Urban Science Beyond Samples: Updated Street Network Models and Indicators for Every Urban Area in the World"
+  authors:
+  - family-names: "Boeing"
+    given-names: "Geoff"
+    orcid: "https://orcid.org/0000-0003-1851-6411"
+    website: "https://geoffboeing.com"
+  year: 2025
+  url: "https://github.com/gboeing/street-network-models"
