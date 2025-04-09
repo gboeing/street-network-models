@@ -1,4 +1,4 @@
-# Urban Street Network Models and Measures
+# Urban Street Network Models and Indicators
 
 This project uses [OSMnx](https://github.com/gboeing/osmnx) to model and analyze the street networks of every urban area in the world then shares the results (models and indicators) in an open data [repository](https://dataverse.harvard.edu/dataverse/global-urban-street-networks) in the Harvard Dataverse.
 
