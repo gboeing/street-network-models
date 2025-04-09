@@ -1,8 +1,9 @@
-.DS_Store
 *.ipynb
+*.pdf
+.DS_Store
 keys.py
 paper/analysis
-*.pdf
+paper/submission
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
