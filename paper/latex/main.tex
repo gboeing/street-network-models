@@ -118,8 +118,7 @@ We used OSMnx v2.0.2 to download OpenStreetMap raw data in February 2025 and con
 
 \subsection{Elevation}
 
-We attach elevation, in meters above sea level, to each node in each urban area's graph use two global digital elevation models (GDEMs): the Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) v3 GDEM, and the Shuttle Radar Topography Mission (SRTM) version 3.0 GDEM with voids filled.
-Both are 1 arcsecond (approximately 30-meter) resolution. First we download all the GDEM rasters for ASTER (45,824 tiles) and SRTM (14,297 tiles) from NASA EarthData. Next we build a virtual raster for each source. Then we use OSMnx to load each GraphML file and attach the elevation from ASTER and SRTM to each graph node.
+We attach elevation, in meters above sea level, to each node in each urban area's graph use two global digital elevation models (GDEMs): the Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) v3 GDEM, and the Shuttle Radar Topography Mission (SRTM) version 3.0 GDEM with voids filled. Both are 1 arcsecond (approximately 30-meter) resolution. First we download all the GDEM rasters for ASTER (45,824 tiles) and SRTM (14,297 tiles) from NASA EarthData. Next we build a virtual raster for each source. Then we use OSMnx to load each GraphML file and attach the elevation from ASTER and SRTM to each graph node.
 
 As each node has both an ASTER and an SRTM elevation value, we choose one to use as the \enquote{official} node elevation by comparing both to a \enquote{tie-breaker} value from Google. To do so, we download each node's elevation from the Google Maps Elevation API, then choose between ASTER and SRTM based on whichever is nearer to Google's value. Then we calculate edge grades and re-save each GraphML file with these node/edge attributes.
 
