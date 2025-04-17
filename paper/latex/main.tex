@@ -40,6 +40,7 @@
 
 \newcommand{\myname}{Geoff Boeing}
 \newcommand{\myemail}{boeing@usc.edu}
+\newcommand{\myorcid}{0000-0003-1851-6411}  % chktex 8
 \newcommand{\myaffiliation}{Department of Urban Planning and Spatial Analysis\\University of Southern California}
 \newcommand{\paperdate}{April 2025}
 \newcommand{\papertitle}{Urban Science Beyond Samples: Updated Street Network Models and Indicators for Every Urban Area in the World}
@@ -82,8 +83,8 @@
 
 \begin{document}
 
-\title{\papertitle}%\footnote{{Preprint of: \papercitation}}}
-\author[]{Redacted for review}%\myname\footnote{Correspondence: \href{mailto:\myemail}{\myemail}}}
+\title{\papertitle}%\footnote{{Citation info: \papercitation}}}
+\author[]{Redacted for review}%\myname~\orcidlink{\myorcid}}
 \affil[]{Redacted for review}%\myaffiliation}
 \date{}%\paperdate}
 
@@ -122,11 +123,11 @@ We attach elevation, in meters above sea level, to each node in each urban area'
 
 As each node has both an ASTER and an SRTM elevation value, we choose one to use as the \enquote{official} node elevation by comparing both to a \enquote{tie-breaker} value from Google. To do so, we download each node's elevation from the Google Maps Elevation API, then choose between ASTER and SRTM based on whichever is nearer to Google's value. Then we calculate edge grades and re-save each GraphML file with these node/edge attributes.
 
-\begin{table}[htbp]
+\begin{table}[bth!]
     \centering
-    \footnotesize
+    \scriptsize
     \caption{The indicators dataset contents. Variables carried over from GHSL are noted.}\label{tab:indicators}
-    \begin{tabular}{p{3.8cm} p{1.2cm} p{7.6cm}}
+    \begin{tabular}{p{3.0cm} p{1.0cm} p{8.2cm}}
         \toprule
         Variable                      & Type    & Description \\
         \midrule
