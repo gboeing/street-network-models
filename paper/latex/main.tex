@@ -1,26 +1,25 @@
 % !TeX program = pdflatex
-% LaTeX Template
+% Urban Science Beyond Samples: Updated Street Network Models and Indicators for Every Urban Area in the World
 % Author: Geoff Boeing
 % Web: https://geoffboeing.com/
 % Repo: https://github.com/gboeing/street-network-models
 
-\RequirePackage[l2tabu,orthodox]{nag} % warn if using any obsolete or outdated commands
+\RequirePackage[l2tabu,orthodox]{nag} % warn if using any obsolete commands
 \documentclass[12pt,letterpaper]{article} % document style
 
-% import encoding and font packages for pdflatex, in order
-\usepackage[T1]{fontenc} % output T1 font encoding (8-bit) so accented characters are a single glyph
+% load encoding and font packages for pdflatex, in order
+\usepackage[T1]{fontenc} % output 8-bit encoded fonts
 \usepackage[utf8]{inputenc} % allow input of utf-8 encoded characters
 \usepackage{ebgaramond} % document's serif font
 \usepackage{tgheros} % document's sans serif font
 
-% import language, regionalization, microtype, and setspace in order
+% load babel, csquotes, and microtype in order
+\usepackage[USenglish]{babel} % auto-regionalize hyphens, quote marks, etc
 \usepackage[strict,autostyle]{csquotes} % smart and nestable quote marks
-\usepackage[USenglish]{babel} % automatically regionalize hyphens, quote marks, etc
-\usepackage{microtype} % improves text appearance with kerning, etc
-\usepackage{setspace} % configure spacing between lines
+\usepackage[babel=true]{microtype} % enable micro-typographic adjustments
 
-% import everything else
-\usepackage{abstract} % allow full-page title/abstract in twocolumn mode
+% load everything else
+\usepackage{amsmath} % additional mathematical typesetting features
 \usepackage{authblk} % footnote-style author/affiliation info
 \usepackage{booktabs} % better looking tables
 \usepackage{caption} % custom figure/table caption styles
@@ -29,11 +28,15 @@
 \usepackage{endnotes} % enable endnotes
 \usepackage{geometry} % configure page dimensions and margins
 \usepackage{graphicx} % better inclusion of graphics
-\usepackage{hyperref} % hypertext in document
-\usepackage{natbib} % author-year citations w/ bibtex, including textual and parenthetical
-\usepackage{rotating} % rotate wide tables or figures on a page to make them landscape
+\usepackage{natbib} % textual/parenthetical author-year citations w/bibtex
+\usepackage{rotating} % rotate wide tables/figures to make them landscape
+\usepackage{setspace} % configure spacing between lines
 \usepackage{titlesec} % custom section and subsection heading
 \usepackage{url} % make nice line-breakble urls
+
+% load hyperref/orcidlink last for compatibility
+\usepackage{hyperref} % enable hyperlinks and pdf metadata
+\usepackage{orcidlink} % provide orcid logo and link
 
 % print only the month and year when using \today
 \newdateformat{monthyeardate}{\monthname[\THEMONTH] \THEYEAR}
