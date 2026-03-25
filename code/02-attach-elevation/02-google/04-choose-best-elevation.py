@@ -30,7 +30,7 @@ print(f"Loaded {len(df_elev):,} Google node elevations")
 def set_elevations(fp, df_elev=df_elev, node_dtypes=node_dtypes):
     # load the graph and attach google elevation data
     G = ox.io.load_graphml(fp, node_dtypes=node_dtypes)
-    nodes, edges = ox.graph_to_gdfs(G)
+    nodes, _edges = ox.graph_to_gdfs(G)
     nodes = nodes.join(df_elev)
 
     # calculate differences in ASTER, SRTM, and Google elevation values
