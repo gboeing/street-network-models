@@ -62,7 +62,7 @@ def calculate_bc(fp, save_path, weight_attr=WEIGHT_ATTR) -> None:
 # get graph filepaths for which we have not yet calculated BC, sorted by size
 filepaths = sorted(graphml_folder.glob("*/*.graphml"), key=getsize)
 savepaths = (save_folder / f"{fp.parent.stem}-{fp.stem}.json" for fp in filepaths)
-args = [(fp, sp) for fp, sp in zip(filepaths, savepaths, strict=False) if not sp.is_file()]
+args = [(fp, sp) for fp, sp in zip(filepaths, savepaths, strict=True) if not sp.is_file()]
 print(ox.ts(), f"There are {len(filepaths):,} total GraphML files")
 print(ox.ts(), f"Calculating BC for {len(args):,} remaining graphs")
 

@@ -58,7 +58,7 @@ def download_data(name, geometry) -> None:
 
 
 names = ucs["country_iso"] + "-" + ucs["GC_UCN_MAI_2025"] + "-" + ucs["ID_UC_G0"].astype(str)
-args = zip(names, ucs["geometry"], strict=False)
+args = zip(names, ucs["geometry"], strict=True)
 
 print(ox.ts(), f"Downloading {len(ucs):,} graphs' data using {cpus} CPUs")
 start_time = time.time()

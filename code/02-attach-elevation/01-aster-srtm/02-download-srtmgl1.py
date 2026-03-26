@@ -53,7 +53,7 @@ print(ox.ts(), f"There are {len(existing):,} files already downloaded")
 
 # how many files are remaining to download?
 tiles = (Path(url).name.split(".")[0] for url in urls)
-remaining = [url for url, tile in zip(urls, tiles, strict=False) if tile not in existing]
+remaining = [url for url, tile in zip(urls, tiles, strict=True) if tile not in existing]
 print(ox.ts(), f"Downloading {len(remaining):,} URLs with {cpus} CPUs")
 
 # multiprocess the queue

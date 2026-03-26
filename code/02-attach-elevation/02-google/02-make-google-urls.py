@@ -43,7 +43,7 @@ def url_add_locations(_, cluster):
     assert len(cluster) <= coords_per_request
     strings = (
         f"{y:.{precision}f},{x:.{precision}f}"
-        for y, x in zip(cluster["y"], cluster["x"], strict=False)
+        for y, x in zip(cluster["y"], cluster["x"], strict=True)
     )
     locations = "|".join(strings)
     return tuple(cluster.index), url_template.format(locations=locations)
