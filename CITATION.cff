@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "Urban Street Network Models and Measures"
+title: "Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World"
 authors:
 - family-names: "Boeing"
   given-names: "Geoff"
@@ -8,12 +8,17 @@ authors:
 url: "https://github.com/gboeing/street-network-models"
 repository-code: "https://github.com/gboeing/street-network-models"
 preferred-citation:
-  type: report
-  title: "Urban Science Beyond Samples: Updated Street Network Models and Indicators for Every Urban Area in the World"
+  type: article
   authors:
   - family-names: "Boeing"
     given-names: "Geoff"
     orcid: "https://orcid.org/0000-0003-1851-6411"
     website: "https://geoffboeing.com"
-  year: 2025
-  url: "https://github.com/gboeing/street-network-models"
+  year: 2026
+  title: "Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World"
+  journal: "Environment and Planning B: Urban Analytics and City Science"
+  volume:
+  issue:
+  start:
+  end:
+  doi:
