@@ -4,7 +4,7 @@ This project uses [OSMnx](https://github.com/gboeing/osmnx) to model and analyze
 
 ## Citation
 
-Boeing, G. 2026. Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World. _Environment and Planning B: Urban Analytics and City Science_, published online ahead of print.
+Boeing, G. 2026. Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World. _Environment and Planning B: Urban Analytics and City Science_, published online ahead of print. doi:10.1177/23998083261446991
 
 ## Computing environment
 
