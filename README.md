@@ -2,6 +2,8 @@
 
 This project uses [OSMnx](https://github.com/gboeing/osmnx) to model and analyze the street networks of every urban area in the world then shares the results (models and indicators) in an open data [repository](https://dataverse.harvard.edu/dataverse/global-urban-street-networks) in the Harvard Dataverse.
 
+The data use bzip2 compression: if your computer doesn't support it natively when unzipping, you can just install a utility like 7-Zip.
+
 ## Citation
 
 Boeing, G. 2026. Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World. _Environment and Planning B: Urban Analytics and City Science_, published online ahead of print. [doi:10.1177/23998083261446991](https://doi.org/10.1177/23998083261446991)
