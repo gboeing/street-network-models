@@ -6,7 +6,7 @@ The data use bzip2 compression: if your computer doesn't support it natively whe
 
 ## Citation
 
-Boeing, G. 2026. Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World. _Environment and Planning B: Urban Analytics and City Science_, published online ahead of print. [doi:10.1177/23998083261446991](https://doi.org/10.1177/23998083261446991)
+Boeing, G. 2026. Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World. _Environment and Planning B: Urban Analytics and City Science_, 53 (8), 1906–1912. [doi:10.1177/23998083261446991](https://doi.org/10.1177/23998083261446991)
 
 ## Computing environment
 
