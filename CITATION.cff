@@ -1,24 +1,29 @@
 cff-version: 1.2.0
-title: "Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World"
+message: If you use these data or code, please cite the article below.
+title: >-
+  Urban Science Beyond Samples: Up-to-Date Street Network Models and
+  Indicators for Every Urban Area in the World
 authors:
-- family-names: "Boeing"
-  given-names: "Geoff"
-  orcid: "https://orcid.org/0000-0003-1851-6411"
-  website: "https://geoffboeing.com"
-url: "https://github.com/gboeing/street-network-models"
-repository-code: "https://github.com/gboeing/street-network-models"
+  - family-names: Boeing
+    given-names: Geoff
+    orcid: https://orcid.org/0000-0003-1851-6411
+    website: https://geoffboeing.com
+url: https://github.com/gboeing/street-network-models
+repository-code: https://github.com/gboeing/street-network-models
 preferred-citation:
   type: article
   authors:
-  - family-names: "Boeing"
-    given-names: "Geoff"
-    orcid: "https://orcid.org/0000-0003-1851-6411"
-    website: "https://geoffboeing.com"
+    - family-names: Boeing
+      given-names: Geoff
+      orcid: https://orcid.org/0000-0003-1851-6411
+      website: https://geoffboeing.com
   year: 2026
-  title: "Urban Science Beyond Samples: Up-to-Date Street Network Models and Indicators for Every Urban Area in the World"
-  journal: "Environment and Planning B: Urban Analytics and City Science"
-  volume:
-  issue:
-  start:
-  end:
-  doi: https://doi.org/10.1177/23998083261446991
+  title: >-
+    Urban science beyond samples: Up-to-date street network models and
+    indicators for every urban area in the world
+  journal: 'Environment and Planning B: Urban Analytics and City Science'
+  volume: 53
+  issue: 8
+  start: 1906
+  end: 1912
+  doi: 10.1177/23998083261446991
