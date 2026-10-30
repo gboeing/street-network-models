@@ -42,3 +42,4 @@ jobs:
         run: pre-commit run --all-files
         env:
           SKIP: no-commit-to-branch
+          PRE_COMMIT_USE_MICROMAMBA: '1'
