@@ -60,7 +60,7 @@ cols = [
     "GH_BPC_TOT_2025",  # total built-up area per-capita (m^2/person)
     "GH_BUH_AVG_2020",  # average height of built surfaces (m) at 100m res
     # economic development
-    "SC_SEC_GDP_2020",  # total GDP PPP (real? USD)
+    "SC_SEC_GDP_2020",  # mean GDP raster value, PPP
     "GC_DEV_WIG_2025",  # world bank income group
     "SC_SEC_HDI_2020",  # human development index at subnational level
     # pollution emission and concentration
