@@ -101,10 +101,10 @@ desc["grade_median"] = "Median absolute street grade (incline)"
 desc["hdi"] = "Human development index at subnational level (GHS)"
 desc["intersect_count"] = "Count of (undirected) edge intersections"
 desc["intersect_count_clean"] = (
-    "Count of street intersections (merged within 10 meters geometrically)"
+    "Count of street intersections (merged geometrically with 10 meter node buffers)"
 )
 desc["intersect_count_clean_topo"] = (
-    "Count of street intersections (merged within 10 meters topologically)"
+    "Count of street intersections (merged topologically with 10 meters node buffers)"
 )
 desc["k_avg"] = "Average node degree (undirected)"
 desc["koppen_geiger"] = "Köppen-Geiger classification of majority of surface (GHS)"
