@@ -36,7 +36,7 @@ def get_elevations(nodes, url, pause=0):
         try:
             ox.log(f"Requesting node elevations from API: {url}")
             time.sleep(pause)
-            response = requests.get(url)
+            response = requests.get(url, timeout=30)
             assert response.ok
             response_json = response.json()
             ox._http._save_to_cache(url, response_json, response.ok)
